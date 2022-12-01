@@ -4,37 +4,26 @@ fn main() {
     let mut index = 0;
     let lines = stdin().lines();
     for line in lines {
-        match line {
-            Ok(line) => {
-                if line == "" {
-                    elves.push(0);
-                    index += 1;
+        if let Ok(line) = line {
+            if line == "" {
+                elves.push(0);
+                index += 1;
+            } else {
+                if let Ok(cal) = i32::from_str_radix(&line, 10) {
+                    elves[index] += cal;
                 } else {
-                    match i32::from_str_radix(&line, 10) {
-                        Ok(cal) => {
-                            elves[index] += cal;
-                        }
-                        Err(_) => panic!("Invalid value")
-                    }
+                    panic!("Invalid value")
                 }
-            },
-            Err(_) => {
-                panic!("AAAAAAAAAAH!")
             }
+        } else {
+            panic!("AAAAAAAAAAH!")
         }
     }
     let elf = Iterator::max(elves.iter());
-    match elf {
-        Some(elf) => {
-            let num = elves.iter().find(|item| item == &elf);
-            match num {
-                Some(num) => println!("The correct elf is {}", num),
-                None => panic!("The elves are starving!")
-            }
-        }
-        None => {
-            panic!("AAAAAAAAAAAAH")
-        }
+    if let Some(elf) = elf {
+        println!("The correct elf is {}", elf);
+    } else {
+        panic!("AAAAAAAAAAAAH")
     }
     let mut sorts = elves.clone();
     sorts.sort_by(|a, b| b.cmp(a));
