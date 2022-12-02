@@ -25,7 +25,7 @@ fn guess(round: String) -> i32 {
         "A" => Throw::Rock,
         "B" => Throw::Paper,
         "C" => Throw::Scissors,
-        _ => unreachable!("That's not a valid play!")
+        _ => unreachable!("That's not a valid play!"),
     };
     // let mut debug = 0;
     let that = match that {
@@ -33,32 +33,32 @@ fn guess(round: String) -> i32 {
             score += 1;
             // debug += 1;
             Throw::Rock
-        },
+        }
         "Y" => {
             score += 2;
             // debug += 2;
             Throw::Paper
-        },
+        }
         "Z" => {
             score += 3;
             // debug += 3;
             Throw::Scissors
-        },
-        _ => unreachable!("What are you doing?")
+        }
+        _ => unreachable!("What are you doing?"),
     };
     match that.result(&this) {
         Ordering::Less => {
             // No point in incrementing an empty score.
             // score += 0;
-        },
+        }
         Ordering::Equal => {
             score += 3;
             // debug += 3;
-        },
+        }
         Ordering::Greater => {
             score += 6;
             // debug += 6;
-        },
+        }
     };
     score
     // print!("This round is {}", debug);
@@ -72,7 +72,7 @@ fn cheat(round: String) -> i32 {
         "A" => Throw::Rock,
         "B" => Throw::Paper,
         "C" => Throw::Scissors,
-        _ => unreachable!("Hey, they're not supposed to cheat!")
+        _ => unreachable!("Hey, they're not supposed to cheat!"),
     };
     // let mut debug = 0;
     let result = match that {
@@ -82,23 +82,29 @@ fn cheat(round: String) -> i32 {
             // score += 0;
             // debug += 1;
             Ordering::Less
-        },
+        }
         "Y" => {
             score += 3;
             // debug += 2;
             Ordering::Equal
-        },
+        }
         "Z" => {
             score += 6;
             // debug += 3;
             Ordering::Greater
-        },
-        _ => unreachable!("Uh, give up I guess?")
+        }
+        _ => unreachable!("Uh, give up I guess?"),
     };
     match this.cheat(result) {
-        Throw::Rock => {score += 1;},
-        Throw::Paper => {score += 2;},
-        Throw::Scissors => {score += 3;},
+        Throw::Rock => {
+            score += 1;
+        }
+        Throw::Paper => {
+            score += 2;
+        }
+        Throw::Scissors => {
+            score += 3;
+        }
     }
     // print!("This round is {}", debug);
     score
@@ -109,7 +115,7 @@ fn cheat(round: String) -> i32 {
 enum Throw {
     Rock,
     Paper,
-    Scissors
+    Scissors,
 }
 
 impl Throw {
@@ -122,13 +128,11 @@ impl Throw {
     /// * [`Ordering::Less`] represents a loss.
     fn result(&self, other: &Throw) -> Ordering {
         match self {
-            Throw::Rock => {
-                match other {
-                    Throw::Rock => Ordering::Equal,
-                    Throw::Paper => Ordering::Less,
-                    Throw::Scissors => Ordering::Greater,
-                }
-            }
+            Throw::Rock => match other {
+                Throw::Rock => Ordering::Equal,
+                Throw::Paper => Ordering::Less,
+                Throw::Scissors => Ordering::Greater,
+            },
             Throw::Paper => match other {
                 Throw::Rock => Ordering::Greater,
                 Throw::Paper => Ordering::Equal,
@@ -144,7 +148,7 @@ impl Throw {
     /// Fulfill the requirements added by part 2. Again, the ordering
     /// represents the result of the game, and the returned value is what you
     /// need to return.
-    /// 
+    ///
     /// * [`Ordering::Less`] results in the value you need to LOSE.
     /// * [`Ordering::Equal`] results in the value you need to TIE.
     /// * [`Ordering::Greater`] results in the value you need to WIN.
