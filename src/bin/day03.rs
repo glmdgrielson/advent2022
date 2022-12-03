@@ -1,3 +1,18 @@
+//! Day 3's Advent of Code puzzle
+//! =============================
+//! Puzzle input consists of a list of alphabetic characters. Each line of input
+//! represents the items that a particular elf has packed for an expedition.
+//! 
+//! Part 1
+//! ------
+//! Split each line of input in two and find the one character that is in both
+//! halves. This item has been incorrectly packed.
+//! 
+//! Part 2
+//! ------
+//! For every three elves, find the item that all three of them have packed.
+//! This is the identification badge for that triplet of elves.
+
 use std::collections::HashSet;
 use std::io::stdin;
 
