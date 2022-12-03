@@ -73,7 +73,7 @@ fn main() {
 
 /// Find the priority value of an item. This is mainly for inputting
 /// solution as required by the Advent of Code site.
-/// 
+///
 /// Priority value is determined as follows:
 /// - Lowercase letters are their position in the alphabet, such that 'a' is 1
 ///     and 'z' is 26.
