@@ -36,6 +36,8 @@ fn main() {
         }
     }
     let mut badge_priority = 0;
+    // This divides the elves into triplets. `chunks` is a helpful
+    // function. I just wish the borrow checker was less annoying.
     for set in lines.chunks(3) {
         let first = set[0].clone();
         let mut badge_set: HashSet<char> = HashSet::new();
