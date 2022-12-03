@@ -2,12 +2,12 @@
 //! =============================
 //! Puzzle input consists of a list of alphabetic characters. Each line of input
 //! represents the items that a particular elf has packed for an expedition.
-//! 
+//!
 //! Part 1
 //! ------
 //! Split each line of input in two and find the one character that is in both
 //! halves. This item has been incorrectly packed.
-//! 
+//!
 //! Part 2
 //! ------
 //! For every three elves, find the item that all three of them have packed.
@@ -58,7 +58,11 @@ fn main() {
         }
         // If everything went okay, there should only ever be one item
         // in the set at this point.
-        assert!(badge_set.len() == 1, "We found counterfeit badges: {:?}", badge_set);
+        assert!(
+            badge_set.len() == 1,
+            "We found counterfeit badges: {:?}",
+            badge_set
+        );
         let badges: Vec<_> = badge_set.into_iter().collect();
         badge_priority += priority_value(badges[0]);
     }
