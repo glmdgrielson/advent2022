@@ -31,17 +31,14 @@ fn guess(round: String) -> i32 {
     let that = match that {
         "X" => {
             score += 1;
-            // debug += 1;
             Throw::Rock
         }
         "Y" => {
             score += 2;
-            // debug += 2;
             Throw::Paper
         }
         "Z" => {
             score += 3;
-            // debug += 3;
             Throw::Scissors
         }
         _ => unreachable!("What are you doing?"),
@@ -53,15 +50,12 @@ fn guess(round: String) -> i32 {
         }
         Ordering::Equal => {
             score += 3;
-            // debug += 3;
         }
         Ordering::Greater => {
             score += 6;
-            // debug += 6;
         }
     };
     score
-    // print!("This round is {}", debug);
 }
 
 fn cheat(round: String) -> i32 {
