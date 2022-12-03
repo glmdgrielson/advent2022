@@ -68,23 +68,19 @@ fn cheat(round: String) -> i32 {
         "C" => Throw::Scissors,
         _ => unreachable!("Hey, they're not supposed to cheat!"),
     };
-    // let mut debug = 0;
     let result = match that {
         "X" => {
             // No point in incrementing an empty score.
             // Other than maybe keeping up appearances of fairness...
             // score += 0;
-            // debug += 1;
             Ordering::Less
         }
         "Y" => {
             score += 3;
-            // debug += 2;
             Ordering::Equal
         }
         "Z" => {
             score += 6;
-            // debug += 3;
             Ordering::Greater
         }
         _ => unreachable!("Uh, give up I guess?"),
@@ -100,7 +96,6 @@ fn cheat(round: String) -> i32 {
             score += 3;
         }
     }
-    // print!("This round is {}", debug);
     score
 }
 
