@@ -71,6 +71,15 @@ fn main() {
     println!("Final sum of badge priority is {}", badge_priority);
 }
 
+/// Find the priority value of an item. This is mainly for inputting
+/// solution as required by the Advent of Code site.
+/// 
+/// Priority value is determined as follows:
+/// - Lowercase letters are their position in the alphabet, such that 'a' is 1
+///     and 'z' is 26.
+/// - Uppercase values are their position in the alphabet _plus 26_
+///     to differentiate them from lowercase letters, such that 'A' is 27
+///     and 'Z' is 52.
 fn priority_value(item: char) -> u32 {
     let prior = item as u32;
     match item {
