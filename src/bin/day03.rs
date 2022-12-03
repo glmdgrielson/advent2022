@@ -35,8 +35,8 @@ fn main() {
                 for elf in triplet.iter() {
                     let chars = elf.chars();
                     if elf == first {
-                        // If this is the first run through, just dump everything
-                        // in the list of candidates.
+                        // If this is the first run through, just dump
+                        // everything in the list of candidates.
                         badge_set = chars.collect();
                     } else {
                         // Otherwise filter everything in the list of candidates
