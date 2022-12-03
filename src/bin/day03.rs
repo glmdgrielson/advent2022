@@ -1,35 +1,49 @@
+use std::collections::HashSet;
 use std::io::stdin;
 
 fn main() {
     let lines = stdin().lines();
+    let lines: Vec<_> = lines.filter(|l| l.is_ok()).map(|l| l.unwrap()).collect();
     let mut priority = 0;
-    'search: for line in lines {
-        if let Ok(sack) = line {
-            let (upper, lower) = sack.split_at(sack.len() / 2);
-            for item in upper.chars() {
-                if let Some(_) = lower.find(item) {
-                    // let prior = item as u32;
-                    // println!("Item found {}, with priority {}", item, prior);
-                    priority += priority_value(item);
-                    continue 'search;
-                }
+    'search: for sack in lines.clone() {
+        let (upper, lower) = sack.split_at(sack.len() / 2);
+        for item in upper.chars() {
+            if let Some(_) = lower.find(item) {
+                priority += priority_value(item);
+                continue 'search;
             }
-        } else {
-            panic!("Oh shoot, we forgot the luggage!")
         }
     }
+    let mut badge_priority = 0;
+    for set in lines.chunks(3) {
+        let first = set[0].clone();
+        let mut badge_set: HashSet<char> = HashSet::new();
+        for elf in set {
+            let chars = elf.chars();
+            if *elf == first {
+                badge_set = chars.collect();
+            } else {
+                let items: HashSet<char> = chars.collect();
+                for item in badge_set.clone() {
+                    if !items.contains(&item) {
+                        badge_set.remove(&item);
+                    }
+                }
+            }
+        }
+        assert!(badge_set.len() == 1, "We found counterfeit badges: {:?}", badge_set);
+        let badges: Vec<_> = badge_set.into_iter().collect();
+        badge_priority += priority_value(badges[0]);
+    }
     println!("Final sum of priorities is {}", priority);
+    println!("Final sum of badge priority is {}", badge_priority);
 }
 
 fn priority_value(item: char) -> u32 {
     let prior = item as u32;
     match item {
-        'a' ..= 'z' => {
-            prior - 96
-        }
-        'A' ..= 'Z' => {
-            prior - 38
-        }
-        _ => unreachable!("That shouldn't be here...")
+        'a'..='z' => prior - 96,
+        'A'..='Z' => prior - 38,
+        _ => unreachable!("That shouldn't be here..."),
     }
 }
