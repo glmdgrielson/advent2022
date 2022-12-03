@@ -32,7 +32,7 @@ fn main() {
                 index += 1;
             } else {
                 // Otherwise, we add the current value to the current elf.
-                if let Ok(cal) = i32::from_str_radix(&line, 10) {
+                if let Ok(cal) = line.parse::<i32>() {
                     elves[index] += cal;
                 } else {
                     // Realistically, this should never be reached.
