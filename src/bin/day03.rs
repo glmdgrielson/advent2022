@@ -65,8 +65,8 @@ fn main() {
                 // but Rust doesn't think that's safe or necessary. Welp.
                 if let Some(_) = lower.find(item) {
                     priority += priority_value(item);
-                    // This shortcuts the search. After all, there should only ever
-                    // be one item shared between the two halves.
+                    // This shortcuts the search. After all, there should only
+                    // ever be one item shared between the two halves.
                     continue 'search;
                 }
             }
