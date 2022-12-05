@@ -13,7 +13,7 @@
 //! ------
 //! Crates are moved one by one, in a first in, last out fashion.
 //! Read the top crate of each stack.
-//! 
+//!
 //! Part 2
 //! ------
 //! Turns out crates are moved in a first in, FIRST out fashion. Oops.
@@ -34,13 +34,13 @@ enum ParserState {
 #[derive(Clone, Copy, PartialEq, Eq)]
 /// An instruction in the input. Could this be a tuple? Yeah, but I want to
 /// be able to read this on Christmas Day, so struct it is!
-struct Instruction {
+struct Task {
 	count: usize,
 	source: usize,
 	dest: usize,
 }
 
-impl Display for Instruction {
+impl Display for Task {
 	/// This is technically unnecessary, but I thought it'd be handy.
 	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
 		f.write_fmt(format_args!(
@@ -54,7 +54,7 @@ fn main() {
 	let lines = stdin().lines();
 	let mut stacks = Vec::new();
 	let mut state = ParserState::Stacks;
-	let mut instructions = Vec::new();
+	let mut tasks = Vec::new();
 	for line in lines {
 		if let Ok(line) = line {
 			match state {
@@ -101,7 +101,7 @@ fn main() {
 					let stop: usize = words[5]
 						.parse()
 						.expect("Sure, just drop it off a cliff...");
-					instructions.push(Instruction {
+					tasks.push(Task {
 						count,
 						// Since this isn't Lua, we need to decrement here.
 						source: start - 1,
@@ -112,10 +112,20 @@ fn main() {
 			}
 		}
 	}
-	// Iterators are fun.
-	let result = part_one(&stacks, instructions)
-		// Convert to a proper iterator.
-		.iter()
+	let result = get_result(part_one(&stacks, tasks.clone()).iter());
+	// Print the end result.
+	println!("End result from above looks like {}", result);
+	let result = get_result(part_two(&stacks, tasks).iter());
+	println!("End result done properly looks like {} from above", result);
+}
+
+/// Turn the thing of stacks into a results string, as expected
+/// by Advent of Code. Iterators are fun.
+fn get_result<'a, I>(iter: I) -> String
+where
+	I: Iterator<Item = &'a Vec<char>>,
+{
+	iter
 		// Get just the last element from each stack.
 		.map(|s| s.last())
 		// Make sure everything actually exists.
@@ -124,13 +134,11 @@ fn main() {
 		// I like to add descriptive error messages anyway, so I use `expect`.
 		.map(|s| s.expect("Was this supposed to be empty?"))
 		// Convert the nasty type into something I can actually USE.
-		.collect::<String>();
-	// Print the end result.
-	println!("End result from above looks like {}", result);
+		.collect::<String>()
 }
 
 /// This function moves all of the boxes one by one.
-fn part_one(stacks: &Vec<Vec<char>>, tasks: Vec<Instruction>) -> Vec<Vec<char>> {
+fn part_one(stacks: &Vec<Vec<char>>, tasks: Vec<Task>) -> Vec<Vec<char>> {
 	let mut stacks = stacks.clone();
 	for task in tasks {
 		for _ in 0..task.count {
@@ -138,6 +146,21 @@ fn part_one(stacks: &Vec<Vec<char>>, tasks: Vec<Instruction>) -> Vec<Vec<char>> 
 				stacks[task.source].pop().expect("Can't stack dirt, Claus!");
 			stacks[task.dest].push(item);
 		}
+	}
+	stacks
+}
+
+fn part_two(stacks: &Vec<Vec<char>>, tasks: Vec<Task>) -> Vec<Vec<char>> {
+	let mut stacks = stacks.clone();
+	for task in tasks {
+		let mut crane = Vec::new();
+		for _ in 0..task.count {
+			let item =
+				stacks[task.source].pop().expect("Can't stack dirt, Claus!");
+			crane.push(item);
+		}
+		crane.reverse();
+		stacks[task.dest].append(&mut crane);
 	}
 	stacks
 }
