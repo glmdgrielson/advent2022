@@ -1,20 +1,82 @@
 //! Day 4's Advent of Code puzzle
 //! =============================
 //! Puzzle input consists of pairs of elves and the areas they have been
-//! assigned.
+//! assigned, in the form `A-B,C-D`.
 //!
 //! Part 1
 //! ------
 //! Find out how many pairs have redundant ranges. These would be pairs where
 //! one elf's range is completely contained by the other elf.
 
+use std::cmp::Ordering;
 use std::io::stdin;
 
 fn main() {
     let lines = stdin().lines();
-    let counter = 0;
+    // Aaaaaaaaand guess who forgot to make the counter variable mutable? Oops.
+    let mut counter = 0;
     for line in lines {
-        // 
+        if let Ok(pair) = line {
+            // `this` should be the first elf. `that` is the second elf.
+            let (this, that) = if let Some(_) = pair.find(',') {
+                let line = pair.split(',').collect::<Vec<_>>();
+                (line[0], line[1])
+            } else {
+                panic!("Cleanup crew to aisle 7!")
+            };
+            let this = if let Some(_) = this.find('-') {
+                let items = this.split('-').collect::<Vec<_>>();
+                let (upper, lower) = (items[0], items[1]);
+                let upper = upper.parse::<i32>();
+                let lower = lower.parse::<i32>();
+                match (upper, lower) {
+                    (Ok(upper), Ok(lower)) => (upper, lower),
+                    _ => panic!("What are you elves doing?"),
+                }
+            } else {
+                panic!("Elf is slacking off!")
+            };
+            let that = if let Some(_) = that.find('-') {
+                let items = that.split('-').collect::<Vec<_>>();
+                let (upper, lower) = (items[0], items[1]);
+                let upper = upper.parse::<i32>();
+                let lower = lower.parse::<i32>();
+                match (upper, lower) {
+                    (Ok(upper), Ok(lower)) => (upper, lower),
+                    _ => panic!("What are you elves doing?"),
+                }
+            } else {
+                panic!("Elf is slacking off!")
+            };
+            match this.0.cmp(&that.0) {
+                Ordering::Less => {
+                    // The start of the first range is before the start
+                    // of the second range.
+                    if this.1 >= that.1 {
+                        // The end of the first range is _after_ the start
+                        // of the second range, so it counts.
+                        counter += 1;
+                        println!("Pairs are {:?} and {:?}", this, that);
+                    }
+                }
+                Ordering::Equal => {
+                    // The start of this range is exactly equal
+                    // the start of the second range. Therefore, one elf
+                    // containing another should be guaranteed?
+                    counter += 1;
+                    println!("Pairs are {:?} and {:?}", this, that);
+                }
+                Ordering::Greater => {
+                    // The start of this range is _inside_ the start of the
+                    // other range. Ergo, we need to check if this range is
+                    // smaller.
+                    if this.1 <= that.1 {
+                        counter += 1;
+                        println!("Pairs are {:?} and {:?}", this, that);
+                    }
+                }
+            }
+        }
     }
     println!("The number of poorly planned elf pairs is {}", counter);
 }
