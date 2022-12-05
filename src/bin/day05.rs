@@ -11,6 +11,12 @@
 //!
 //! Part 1
 //! ------
+//! Crates are moved one by one, in a first in, last out fashion.
+//! Read the top crate of each stack.
+//! 
+//! Part 2
+//! ------
+//! Turns out crates are moved in a first in, FIRST out fashion. Oops.
 //! Read the top crate of each stack.
 
 use std::fmt::{self, Display, Formatter};
@@ -106,20 +112,32 @@ fn main() {
 			}
 		}
 	}
-	instructions.into_iter().for_each(|task| {
+	// Iterators are fun.
+	let result = part_one(&stacks, instructions)
+		// Convert to a proper iterator.
+		.iter()
+		// Get just the last element from each stack.
+		.map(|s| s.last())
+		// Make sure everything actually exists.
+		.filter(|s| s.is_some())
+		// This operation is technically infalliable due to above, but
+		// I like to add descriptive error messages anyway, so I use `expect`.
+		.map(|s| s.expect("Was this supposed to be empty?"))
+		// Convert the nasty type into something I can actually USE.
+		.collect::<String>();
+	// Print the end result.
+	println!("End result from above looks like {}", result);
+}
+
+/// This function moves all of the boxes one by one.
+fn part_one(stacks: &Vec<Vec<char>>, tasks: Vec<Instruction>) -> Vec<Vec<char>> {
+	let mut stacks = stacks.clone();
+	for task in tasks {
 		for _ in 0..task.count {
 			let item =
 				stacks[task.source].pop().expect("Can't stack dirt, Claus!");
 			stacks[task.dest].push(item);
 		}
-	});
-	// Iterators are fun.
-	let result = stacks
-		.iter()
-		.map(|s| s.last())
-		.filter(|s| s.is_some())
-		.map(|s| s.expect("Was this supposed to be empty?"))
-		.collect::<String>();
-	println!("End result from above looks like {}", result);
-	// todo!("Oh holy night, I hate this already.")
+	}
+	stacks
 }
