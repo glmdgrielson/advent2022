@@ -34,19 +34,19 @@ use std::cmp::Ordering;
 use std::io::stdin;
 
 fn main() {
-    let lines = stdin().lines();
-    let mut score = 0;
-    let mut score2 = 0;
-    for line in lines {
-        if let Ok(round) = line {
-            score += guess(round.clone());
-            score2 += cheat(round);
-        } else {
-            panic!("AAAAAAAAAH!")
-        }
-    }
-    println!("Final score is {}.", score);
-    println!("The final score with cheating is {}.", score2);
+	let lines = stdin().lines();
+	let mut score = 0;
+	let mut score2 = 0;
+	for line in lines {
+		if let Ok(round) = line {
+			score += guess(round.clone());
+			score2 += cheat(round);
+		} else {
+			panic!("AAAAAAAAAH!")
+		}
+	}
+	println!("Final score is {}.", score);
+	println!("The final score with cheating is {}.", score2);
 }
 
 /// This function solves the first half of the puzzle, where the second
@@ -61,48 +61,48 @@ fn main() {
 ///
 /// The returned value is the answer to part 1.
 fn guess(round: String) -> i32 {
-    let mut score = 0;
-    let res: Vec<&str> = round.split(" ").collect();
-    let (this, that) = (res[0], res[1]);
-    // Figure out what the other elf is throwing.
-    let this = match this {
-        "A" => Throw::Rock,
-        "B" => Throw::Paper,
-        "C" => Throw::Scissors,
-        _ => unreachable!("That's not a valid play!"),
-    };
-    // Figure out what you need to throw according to the guide.
-    // This also increments the score, since we already know what we should
-    // be adding to it.
-    let that = match that {
-        "X" => {
-            score += 1;
-            Throw::Rock
-        }
-        "Y" => {
-            score += 2;
-            Throw::Paper
-        }
-        "Z" => {
-            score += 3;
-            Throw::Scissors
-        }
-        _ => unreachable!("What are you doing?"),
-    };
-    // Increment the score by the result of the match.
-    match that.result(&this) {
-        Ordering::Less => {
-            // No point in incrementing an empty score.
-            // score += 0;
-        }
-        Ordering::Equal => {
-            score += 3;
-        }
-        Ordering::Greater => {
-            score += 6;
-        }
-    };
-    score
+	let mut score = 0;
+	let res: Vec<&str> = round.split(" ").collect();
+	let (this, that) = (res[0], res[1]);
+	// Figure out what the other elf is throwing.
+	let this = match this {
+		"A" => Throw::Rock,
+		"B" => Throw::Paper,
+		"C" => Throw::Scissors,
+		_ => unreachable!("That's not a valid play!"),
+	};
+	// Figure out what you need to throw according to the guide.
+	// This also increments the score, since we already know what we should
+	// be adding to it.
+	let that = match that {
+		"X" => {
+			score += 1;
+			Throw::Rock
+		}
+		"Y" => {
+			score += 2;
+			Throw::Paper
+		}
+		"Z" => {
+			score += 3;
+			Throw::Scissors
+		}
+		_ => unreachable!("What are you doing?"),
+	};
+	// Increment the score by the result of the match.
+	match that.result(&this) {
+		Ordering::Less => {
+			// No point in incrementing an empty score.
+			// score += 0;
+		}
+		Ordering::Equal => {
+			score += 3;
+		}
+		Ordering::Greater => {
+			score += 6;
+		}
+	};
+	score
 }
 
 /// Now the fun part. This part assumes the second character is how you need to
@@ -122,112 +122,112 @@ fn guess(round: String) -> i32 {
 /// a greater number than the first half. After all, if it didn't, there's no
 /// point in being this sneaky.
 fn cheat(round: String) -> i32 {
-    let mut score = 0;
-    // I wonder if in Python this would be one line instead of two.
-    let res: Vec<&str> = round.split(" ").collect();
-    let (this, that) = (res[0], res[1]);
-    // Figure out what the other guy is doing. This is the same as in
-    // `guess`, except with a snarkier response to invalid input.
-    let this = match this {
-        "A" => Throw::Rock,
-        "B" => Throw::Paper,
-        "C" => Throw::Scissors,
-        _ => unreachable!("Hey, they're not supposed to cheat!"),
-    };
-    // Figure out how the strategy guide says we should throw the match.
-    // Given that we already know the result, we can bump up the score here.
-    let result = match that {
-        "X" => {
-            // No point in incrementing an empty score.
-            // Other than maybe keeping up appearances of fairness...
-            // score += 0;
-            Ordering::Less
-        }
-        "Y" => {
-            score += 3;
-            Ordering::Equal
-        }
-        "Z" => {
-            score += 6;
-            Ordering::Greater
-        }
-        _ => unreachable!("Uh, give up I guess?"),
-    };
-    // Figure out what throw will throw the match. Pun intended.
-    // Adjust the score accordingly.
-    match this.cheat(result) {
-        Throw::Rock => {
-            score += 1;
-        }
-        Throw::Paper => {
-            score += 2;
-        }
-        Throw::Scissors => {
-            score += 3;
-        }
-    }
-    score
+	let mut score = 0;
+	// I wonder if in Python this would be one line instead of two.
+	let res: Vec<&str> = round.split(" ").collect();
+	let (this, that) = (res[0], res[1]);
+	// Figure out what the other guy is doing. This is the same as in
+	// `guess`, except with a snarkier response to invalid input.
+	let this = match this {
+		"A" => Throw::Rock,
+		"B" => Throw::Paper,
+		"C" => Throw::Scissors,
+		_ => unreachable!("Hey, they're not supposed to cheat!"),
+	};
+	// Figure out how the strategy guide says we should throw the match.
+	// Given that we already know the result, we can bump up the score here.
+	let result = match that {
+		"X" => {
+			// No point in incrementing an empty score.
+			// Other than maybe keeping up appearances of fairness...
+			// score += 0;
+			Ordering::Less
+		}
+		"Y" => {
+			score += 3;
+			Ordering::Equal
+		}
+		"Z" => {
+			score += 6;
+			Ordering::Greater
+		}
+		_ => unreachable!("Uh, give up I guess?"),
+	};
+	// Figure out what throw will throw the match. Pun intended.
+	// Adjust the score accordingly.
+	match this.cheat(result) {
+		Throw::Rock => {
+			score += 1;
+		}
+		Throw::Paper => {
+			score += 2;
+		}
+		Throw::Scissors => {
+			score += 3;
+		}
+	}
+	score
 }
 
 #[derive(PartialEq, Eq, Debug)]
 /// Represents a Rock Paper Scissors throw.
 enum Throw {
-    Rock,
-    Paper,
-    Scissors,
+	Rock,
+	Paper,
+	Scissors,
 }
 
 impl Throw {
-    /// I was going to use [`PartialOrd`] for this, but that seemed a bit too
-    /// much like I was abusing the mechanism. So I did this. Same enum, but
-    /// not using the operators in bad ways.
-    ///
-    /// * [`Ordering::Greater`] represents a victory.
-    /// * [`Ordering::Equal`] represents a tie.
-    /// * [`Ordering::Less`] represents a loss.
-    fn result(&self, other: &Throw) -> Ordering {
-        match self {
-            Throw::Rock => match other {
-                Throw::Rock => Ordering::Equal,
-                Throw::Paper => Ordering::Less,
-                Throw::Scissors => Ordering::Greater,
-            },
-            Throw::Paper => match other {
-                Throw::Rock => Ordering::Greater,
-                Throw::Paper => Ordering::Equal,
-                Throw::Scissors => Ordering::Less,
-            },
-            Throw::Scissors => match other {
-                Throw::Rock => Ordering::Less,
-                Throw::Paper => Ordering::Greater,
-                Throw::Scissors => Ordering::Equal,
-            },
-        }
-    }
-    /// Fulfill the requirements added by part 2. Again, the ordering
-    /// represents the result of the game, and the returned value is what you
-    /// need to throw in response.
-    ///
-    /// * [`Ordering::Less`] results in the value you need to LOSE.
-    /// * [`Ordering::Equal`] results in the value you need to TIE.
-    /// * [`Ordering::Greater`] results in the value you need to WIN.
-    fn cheat(&self, result: Ordering) -> Self {
-        match self {
-            Throw::Rock => match result {
-                Ordering::Less => Throw::Scissors,
-                Ordering::Equal => Throw::Rock,
-                Ordering::Greater => Throw::Paper,
-            },
-            Throw::Paper => match result {
-                Ordering::Less => Throw::Rock,
-                Ordering::Equal => Throw::Paper,
-                Ordering::Greater => Throw::Scissors,
-            },
-            Throw::Scissors => match result {
-                Ordering::Less => Throw::Paper,
-                Ordering::Equal => Throw::Scissors,
-                Ordering::Greater => Throw::Rock,
-            },
-        }
-    }
+	/// I was going to use [`PartialOrd`] for this, but that seemed a bit too
+	/// much like I was abusing the mechanism. So I did this. Same enum, but
+	/// not using the operators in bad ways.
+	///
+	/// * [`Ordering::Greater`] represents a victory.
+	/// * [`Ordering::Equal`] represents a tie.
+	/// * [`Ordering::Less`] represents a loss.
+	fn result(&self, other: &Throw) -> Ordering {
+		match self {
+			Throw::Rock => match other {
+				Throw::Rock => Ordering::Equal,
+				Throw::Paper => Ordering::Less,
+				Throw::Scissors => Ordering::Greater,
+			},
+			Throw::Paper => match other {
+				Throw::Rock => Ordering::Greater,
+				Throw::Paper => Ordering::Equal,
+				Throw::Scissors => Ordering::Less,
+			},
+			Throw::Scissors => match other {
+				Throw::Rock => Ordering::Less,
+				Throw::Paper => Ordering::Greater,
+				Throw::Scissors => Ordering::Equal,
+			},
+		}
+	}
+	/// Fulfill the requirements added by part 2. Again, the ordering
+	/// represents the result of the game, and the returned value is what you
+	/// need to throw in response.
+	///
+	/// * [`Ordering::Less`] results in the value you need to LOSE.
+	/// * [`Ordering::Equal`] results in the value you need to TIE.
+	/// * [`Ordering::Greater`] results in the value you need to WIN.
+	fn cheat(&self, result: Ordering) -> Self {
+		match self {
+			Throw::Rock => match result {
+				Ordering::Less => Throw::Scissors,
+				Ordering::Equal => Throw::Rock,
+				Ordering::Greater => Throw::Paper,
+			},
+			Throw::Paper => match result {
+				Ordering::Less => Throw::Rock,
+				Ordering::Equal => Throw::Paper,
+				Ordering::Greater => Throw::Scissors,
+			},
+			Throw::Scissors => match result {
+				Ordering::Less => Throw::Paper,
+				Ordering::Equal => Throw::Scissors,
+				Ordering::Greater => Throw::Rock,
+			},
+		}
+	}
 }
