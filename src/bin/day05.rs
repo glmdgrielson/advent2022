@@ -88,7 +88,7 @@ fn main() {
 				ParserState::Instructions => {
 					// Right, time for the fun part.
 					// Line format is `move X from Y to Z`
-					let words: Vec<_> = line.split(" ").collect();
+					let words: Vec<_> = line.split(' ').collect();
 					// This is after `move` in the input.
 					let count = words[1].parse().expect(
 						"There is no north of here, it's the North Pole!",
@@ -110,6 +110,8 @@ fn main() {
 					});
 				}
 			}
+		} else {
+			panic!("Input has failed! AAAAAAAAAAH!")
 		}
 	}
 	let result = get_result(part_one(&stacks, tasks.clone()).iter());
@@ -126,20 +128,16 @@ where
 	I: Iterator<Item = &'a Vec<char>>,
 {
 	iter
-		// Get just the last element from each stack.
-		.map(|s| s.last())
-		// Make sure everything actually exists.
-		.filter(|s| s.is_some())
-		// This operation is technically infalliable due to above, but
-		// I like to add descriptive error messages anyway, so I use `expect`.
-		.map(|s| s.expect("Was this supposed to be empty?"))
+		// Get just the last element from each stack. This ignores any empty
+		// stacks, so...
+		.filter_map(|s| s.last())
 		// Convert the nasty type into something I can actually USE.
 		.collect::<String>()
 }
 
 /// This function moves all of the boxes one by one.
-fn part_one(stacks: &Vec<Vec<char>>, tasks: Vec<Task>) -> Vec<Vec<char>> {
-	let mut stacks = stacks.clone();
+fn part_one(stacks: &[Vec<char>], tasks: Vec<Task>) -> Vec<Vec<char>> {
+	let mut stacks = stacks.to_owned();
 	for task in tasks {
 		for _ in 0..task.count {
 			let item =
@@ -150,8 +148,8 @@ fn part_one(stacks: &Vec<Vec<char>>, tasks: Vec<Task>) -> Vec<Vec<char>> {
 	stacks
 }
 
-fn part_two(stacks: &Vec<Vec<char>>, tasks: Vec<Task>) -> Vec<Vec<char>> {
-	let mut stacks = stacks.clone();
+fn part_two(stacks: &[Vec<char>], tasks: Vec<Task>) -> Vec<Vec<char>> {
+	let mut stacks = stacks.to_owned();
 	for task in tasks {
 		let mut crane = Vec::new();
 		for _ in 0..task.count {

@@ -26,7 +26,7 @@ fn main() {
 	let lines = stdin().lines();
 	for line in lines {
 		if let Ok(line) = line {
-			if line == "" {
+			if line.is_empty() {
 				// If the line is empty, we move onto the next elf.
 				elves.push(0);
 				index += 1;

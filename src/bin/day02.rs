@@ -62,7 +62,7 @@ fn main() {
 /// The returned value is the answer to part 1.
 fn guess(round: String) -> i32 {
 	let mut score = 0;
-	let res: Vec<&str> = round.split(" ").collect();
+	let res: Vec<&str> = round.split(' ').collect();
 	let (this, that) = (res[0], res[1]);
 	// Figure out what the other elf is throwing.
 	let this = match this {
@@ -124,7 +124,7 @@ fn guess(round: String) -> i32 {
 fn cheat(round: String) -> i32 {
 	let mut score = 0;
 	// I wonder if in Python this would be one line instead of two.
-	let res: Vec<&str> = round.split(" ").collect();
+	let res: Vec<&str> = round.split(' ').collect();
 	let (this, that) = (res[0], res[1]);
 	// Figure out what the other guy is doing. This is the same as in
 	// `guess`, except with a snarkier response to invalid input.

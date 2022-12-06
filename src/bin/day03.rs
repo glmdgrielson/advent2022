@@ -63,13 +63,15 @@ fn main() {
 			for item in upper.chars() {
 				// If this were Python, I could just do `item in lower`,
 				// but Rust doesn't think that's safe or necessary. Welp.
-				if let Some(_) = lower.find(item) {
+				if lower.find(item).is_some() {
 					priority += priority_value(item);
 					// This shortcuts the search. After all, there should only
 					// ever be one item shared between the two halves.
 					continue 'search;
 				}
 			}
+		} else {
+			panic!("Input has failed! AAAAAAAAAAH!")
 		}
 	}
 	// Print the solutions to the puzzles.

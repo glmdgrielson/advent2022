@@ -11,7 +11,7 @@
 //! Part 2
 //! ------
 //! Find out how many pairs contain any sort of overlap.
-
+#![warn(clippy::all)]
 use std::cmp::Ordering;
 use std::io::stdin;
 
@@ -23,13 +23,13 @@ fn main() {
 	for line in lines {
 		if let Ok(pair) = line {
 			// `this` should be the first elf. `that` is the second elf.
-			let (this, that) = if let Some(_) = pair.find(',') {
+			let (this, that) = if pair.find(',').is_some() {
 				let line = pair.split(',').collect::<Vec<_>>();
 				(line[0], line[1])
 			} else {
 				panic!("Cleanup crew to aisle 7!")
 			};
-			let this = if let Some(_) = this.find('-') {
+			let this = if this.find('-').is_some() {
 				let items = this.split('-').collect::<Vec<_>>();
 				let (upper, lower) = (items[0], items[1]);
 				let upper = upper.parse::<i32>();
@@ -41,7 +41,7 @@ fn main() {
 			} else {
 				panic!("Elf is slacking off!")
 			};
-			let that = if let Some(_) = that.find('-') {
+			let that = if that.find('-').is_some() {
 				let items = that.split('-').collect::<Vec<_>>();
 				let (upper, lower) = (items[0], items[1]);
 				let upper = upper.parse::<i32>();
@@ -59,6 +59,8 @@ fn main() {
 			if overlaps(this, that) {
 				overlap_count += 1;
 			}
+		} else {
+			panic!("Input has failed! AAAAAAAAAH!");
 		}
 	}
 	println!(
