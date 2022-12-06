@@ -5,6 +5,10 @@
 /// Part 1
 /// ------
 /// Find the index of the first four characters that are unique.
+/// 
+/// Part 2
+/// ------
+/// Find the index of the first sequence of _fourteen_ unique characters.
 use std::io::{stdin, Read};
 
 const PACKET_SIZE: usize = 4;
