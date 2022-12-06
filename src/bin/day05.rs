@@ -148,6 +148,7 @@ fn part_one(stacks: &[Vec<char>], tasks: Vec<Task>) -> Vec<Vec<char>> {
 	stacks
 }
 
+/// This function moves all of the boxes at once.
 fn part_two(stacks: &[Vec<char>], tasks: Vec<Task>) -> Vec<Vec<char>> {
 	let mut stacks = stacks.to_owned();
 	for task in tasks {
