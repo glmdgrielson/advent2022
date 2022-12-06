@@ -32,8 +32,8 @@ fn main() {
 			let this = if this.find('-').is_some() {
 				let items = this.split('-').collect::<Vec<_>>();
 				let (upper, lower) = (items[0], items[1]);
-				let upper = upper.parse::<i32>();
-				let lower = lower.parse::<i32>();
+				let upper = upper.parse();
+				let lower = lower.parse();
 				match (upper, lower) {
 					(Ok(upper), Ok(lower)) => (upper, lower),
 					_ => panic!("What are you elves doing?"),
@@ -44,8 +44,8 @@ fn main() {
 			let that = if that.find('-').is_some() {
 				let items = that.split('-').collect::<Vec<_>>();
 				let (upper, lower) = (items[0], items[1]);
-				let upper = upper.parse::<i32>();
-				let lower = lower.parse::<i32>();
+				let upper = upper.parse();
+				let lower = lower.parse();
 				match (upper, lower) {
 					(Ok(upper), Ok(lower)) => (upper, lower),
 					_ => panic!("What are you elves doing?"),
