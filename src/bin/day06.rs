@@ -67,7 +67,10 @@ fn main() {
 }
 
 /// Check whether the last `size` elements of this array are unique.
-fn is_window_unique(marker: &[u8], size: usize) -> bool {
+fn is_window_unique<T>(marker: &[T], size: usize) -> bool
+where
+	T: Ord,
+{
 	let mut set = marker
 		.iter() // Create an iterator.
 		.rev() // Reverse the iterator so that the back is more accessible.
