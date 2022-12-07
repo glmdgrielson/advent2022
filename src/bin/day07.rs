@@ -8,6 +8,11 @@
 /// ------
 /// Find the sum of all of the "small" directories, where small is defined
 /// as taking no more than `100_000` bytes.
+///
+/// Part 2
+/// ------
+/// Now it's time to clean up space. Find the smallest directory that will
+/// give us enough space, so we don't `rm -rf /` like a dolt.
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::stdin;
@@ -15,6 +20,8 @@ use std::rc::Rc;
 
 /// The size of directory we care about.
 const SMALL_DIRECTORY: usize = 100_000;
+const TOTAL_DISK_SPACE: usize = 70_000_000;
+const SPACE_NEEDED: usize = 30_000_000;
 
 #[derive(Clone, Debug, PartialEq)]
 /// Represents a file on disk. This could probably be attached to its
@@ -111,9 +118,17 @@ fn main() {
 	}
 	let mut sizes: Vec<usize> = vec![];
 	let borrowed = root.borrow();
-	let (_, sizes) = calc_sum(&borrowed, &mut sizes);
+	let (cur_size, sizes) = calc_sum(&borrowed, &mut sizes);
 	let res: usize = sizes.iter().filter(|&s| *s < SMALL_DIRECTORY).sum();
 	println!("Total sum of all of the small directories is {}", res);
+	let needed = SPACE_NEEDED - (TOTAL_DISK_SPACE - cur_size);
+	let dead_dir = sizes.iter().filter(|&x| *x > needed).min();
+	match dead_dir {
+		Some(dead_size) => {
+			println!("Good news, you can clear up {}!", dead_size)
+		}
+		None => panic!("Welp, you need a new computer. Sorry!"),
+	}
 }
 
 /// And today we get to play with _recursive_ functions!
@@ -126,10 +141,14 @@ fn calc_sum<'a>(
 		return (node.size.expect("Is this /dev/null?"), sizes);
 	}
 	let sum_c = node
-		.children // Get the children of this node
-		.values() // Get just the sizes.
-		.map(|c| calc_sum(&c.borrow(), sizes).0) // Map this function onto the children.
-		.sum(); // Add them all together.
+		// Get the children of this node
+		.children
+		// Get just the sizes.
+		.values()
+		// Map this function onto the children.
+		.map(|c| calc_sum(&c.borrow(), sizes).0)
+		// Add them all together.
+		.sum();
 	sizes.push(sum_c); // Add this result to the size list.
 	(sum_c, sizes)
 }
