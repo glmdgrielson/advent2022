@@ -57,8 +57,8 @@ fn main() {
 			}
 		} else {
 			// "Handle" error because I dislike `flatten` as a method.
-			// The unwrap is safe because there's no way to get here
-			// an `Ok` because we just failed a pattern match on that state.
+			// The unwrap is safe because there's no way to get an `Ok` here
+			// because we just failed a pattern match on that state.
 			panic!("Welp, your input has failed: {}. Oops!", byte.unwrap_err());
 		}
 	}
