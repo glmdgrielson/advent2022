@@ -17,26 +17,15 @@ fn main() {
 			Ok(line) => Some(line),
 			Err(err) => panic!("Welp, your input failed: {}", err),
 		})
+		.map(|l| l.as_bytes().to_owned())
 		.collect::<Vec<_>>();
 	println!("Number of seen trees is {}", tree_finder(&input));
+	println!("Most scenic spot is {}", scenic_tester(&input));
 }
 
-fn tree_finder(input: &[String]) -> usize {
-	let grid = input
-		.iter()
-		.map(|l| {
-			l.as_bytes()
-				.iter()
-				.map(|&b| (b - b'0'))
-				.collect::<Vec<u8>>()
-		})
-		.collect::<Vec<_>>();
+fn tree_finder(grid: &[Vec<u8>]) -> usize {
 	let mut seen = HashSet::new();
-	let seen_count = (grid.len() * 2) // length of a row
-		    + (grid[0].len() * 2) // length of a column
-		    - 4;
-	// number of corners counted twice.
-	// Thank you best practices! Iterators are fun.
+
 	loop_interior(grid.iter(), |(r, row)| {
 		let mut tallest = row[0];
 		loop_interior(row.iter(), |(c, &height)| {
@@ -44,9 +33,9 @@ fn tree_finder(input: &[String]) -> usize {
 				tallest = height;
 				seen.insert((r, c));
 			}
-			//
 		});
-		let mut tallest = row[row.len() - 1];
+
+		tallest = row[row.len() - 1];
 		loop_interior(row.iter().rev(), |(c, &height)| {
 			if height > tallest {
 				tallest = height;
@@ -54,34 +43,149 @@ fn tree_finder(input: &[String]) -> usize {
 			}
 		});
 	});
-	loop_interior(grid[0].iter(), |(c, _)| {
+
+	for c in 1..grid[0].len() - 1 {
 		let mut tallest = grid[0][c];
-		loop_interior(grid.iter(), |(r, _)| {
-			let height = grid[r][c];
+		loop_interior(grid.iter(), |(r, row)| {
+			let height = row[c];
 			if height > tallest {
 				tallest = height;
 				seen.insert((r, c));
 			}
 		});
-		let mut tallest = grid[grid.len() - 1][c];
-		loop_interior(grid.iter().rev(), |(r, _)| {
-			let height = grid[r][c];
+
+		tallest = grid[grid.len() - 1][c];
+		loop_interior(grid.iter().rev(), |(r, row)| {
+			let height = row[c];
 			if height > tallest {
 				tallest = height;
 				seen.insert((r, c));
 			}
+		});
+	}
+
+	seen.len() + grid.len() * 2 + grid[0].len() * 2 - 4
+}
+
+fn scenic_tester(grid: &[Vec<u8>]) -> usize {
+	let mut map = HashSet::new();
+	grid.iter().enumerate().for_each(|(row, line)| {
+		line.iter().enumerate().for_each(|(col, _)| {
+			map.insert((row, col));
 		});
 	});
-	seen_count + seen.len()
+	let mut max_score = 0;
+	for (r, c) in map.iter() {
+		let (r, c) = (*r, *c);
+
+		eprintln!("Item ({}, {}) is {}", r, c, grid[r][c]);
+
+		let score = get_score(grid, r, c);
+
+		if score > max_score {
+			max_score = score;
+		}
+	}
+	// for (r, c) in map.keys() {
+	// 	//
+	// }
+	// let directi
+	// scenic_score(map);
+	max_score
 }
+
+fn get_score(grid: &[Vec<u8>], r: usize, c: usize) -> usize {
+	let row = &grid[r];
+	let left = &row[0..c];
+	let mut l_score = 0;
+	left.iter().rfold(0, |i, &c| {
+		if i < c {
+			l_score += 1;
+			c
+		} else {
+			i
+		}
+	});
+	let score = l_score;
+	let right = &row[c + 1..];
+	let mut r_score = 0;
+	right.iter().fold(0, |i, &height| {
+		if i < height {
+			r_score += 1;
+			height
+		} else {
+			i
+		}
+	});
+	let score = score * r_score;
+	let col = grid.iter().map(|row| row[c]).collect::<Vec<_>>();
+	let up = &col[0..r];
+	let mut u_score = 0;
+	up.iter().rfold(0, |i, &height| {
+		if i < height {
+			u_score += 1;
+			height
+		} else {
+			i
+		}
+	});
+	let score = score * u_score;
+	let down = &col[r + 1..];
+	let mut d_score = 0;
+	down.iter().fold(0, |acc, &height| {
+		if acc < height {
+			d_score += 1;
+			height
+		} else {
+			acc
+		}
+	});
+	let score = score * d_score;
+	eprintln!(
+		"Item ({}, {}) has score {} ({} * {} * {} * {})",
+		r, c, score, l_score, r_score, u_score, d_score
+	);
+	score
+}
+
+#[cfg(test)]
 mod test {
-	#[allow(dead_code)]
+	#[cfg(test)]
+	use crate::get_score;
+
+	#[cfg(test)]
 	const EXAMPLE: &str = "30373\n25512\n65332\n33549\n35390";
 	#[test]
 	fn example_part1() {
 		use crate::tree_finder;
-		let example: Vec<_> = EXAMPLE.lines().map(|s| s.to_owned()).collect();
+		let example: Vec<_> =
+			EXAMPLE.lines().map(|s| s.as_bytes().to_owned()).collect();
 		assert_eq!(tree_finder(&example), 21);
+	}
+
+	#[test]
+	fn example_part2() {
+		use crate::scenic_tester;
+		let data = [
+			vec![3, 0, 3, 7, 3],
+			vec![2, 5, 5, 1, 2],
+			vec![6, 5, 3, 3, 2],
+			vec![3, 3, 5, 4, 9],
+			vec![3, 5, 3, 9, 0],
+		];
+		assert_eq!(scenic_tester(&data), 8);
+	}
+
+	#[test]
+	fn check_score() {
+		let data = [
+			vec![3, 0, 3, 7, 3],
+			vec![2, 5, 5, 1, 2],
+			vec![6, 5, 3, 3, 2],
+			vec![3, 3, 5, 4, 9],
+			vec![3, 5, 3, 9, 0],
+		];
+		assert_eq!(get_score(&data, 2, 3), 8)
 	}
 }
 
