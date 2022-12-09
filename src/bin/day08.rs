@@ -78,7 +78,7 @@ fn scenic_tester(grid: &[Vec<u8>]) -> usize {
 	for (r, c) in map.iter() {
 		let (r, c) = (*r, *c);
 
-		eprintln!("Item ({}, {}) is {}", r, c, grid[r][c]);
+		// eprintln!("Item ({}, {}) is {}", r, c, grid[r][c]);
 
 		let score = get_score(grid, r, c);
 
@@ -94,58 +94,55 @@ fn scenic_tester(grid: &[Vec<u8>]) -> usize {
 	max_score
 }
 
-fn get_score(grid: &[Vec<u8>], r: usize, c: usize) -> usize {
-	let row = &grid[r];
-	let left = &row[0..c];
-	let mut l_score = 0;
-	left.iter().rfold(0, |i, &c| {
-		if i <= c {
-			l_score += 1;
-			c
-		} else {
-			i
-		}
-	});
-	let score = l_score;
-	let right = &row[c + 1..];
-	let mut r_score = 0;
-	right.iter().fold(0, |i, &height| {
-		if i <= height {
-			r_score += 1;
-			height
-		} else {
-			i
-		}
-	});
-	let score = score * r_score;
-	let col = grid.iter().map(|row| row[c]).collect::<Vec<_>>();
-	let up = &col[0..r];
-	let mut u_score = 0;
-	up.iter().rfold(0, |i, &height| {
-		if i <= height {
-			u_score += 1;
-			height
-		} else {
-			i
-		}
-	});
-	let score = score * u_score;
-	let down = &col[r + 1..];
-	let mut d_score = 0;
-	down.iter().fold(0, |acc, &height| {
-		if acc <= height {
-			d_score += 1;
-			height
-		} else {
-			acc
-		}
-	});
-	let score = score * d_score;
-	eprintln!(
-		"Item ({}, {}) has score {} ({} * {} * {} * {})",
-		r, c, score, l_score, r_score, u_score, d_score
-	);
-	score
+fn get_score(forest: &[Vec<u8>], x: usize, y: usize) -> usize {
+	let h = forest[y][x];
+	let height = forest.len();
+	let width = forest[0].len();
+	let mut scenic_score = 1;
+
+	scenic_score *= if let Some((pos, _)) = forest[y][0..x]
+		.iter()
+		.rev()
+		.enumerate()
+		.find(|(_, f)| **f >= h)
+	{
+		pos + 1
+	} else {
+		x
+	};
+
+	scenic_score *= if let Some((pos, _)) = forest[y][(x + 1)..]
+		.iter()
+		.enumerate()
+		.find(|(_, f)| **f >= h)
+	{
+		pos + 1
+	} else {
+		width - x - 1
+	};
+
+	scenic_score *= if let Some((pos, _)) = forest[0..y]
+		.iter()
+		.rev()
+		.enumerate()
+		.find(|(_, r)| r[x] >= h)
+	{
+		pos + 1
+	} else {
+		y
+	};
+
+	scenic_score *= if let Some((pos, _)) = forest[(y + 1)..]
+		.iter()
+		.enumerate()
+		.find(|(_, r)| r[x] >= h)
+	{
+		pos + 1
+	} else {
+		height - y - 1
+	};
+
+	scenic_score
 }
 
 #[cfg(test)]
@@ -185,7 +182,7 @@ mod test {
 			vec![3, 3, 5, 4, 9],
 			vec![3, 5, 3, 9, 0],
 		];
-		assert_eq!(get_score(&data, 3, 2), 8)
+		assert_eq!(get_score(&data, 2, 3), 8)
 	}
 
 	#[test]
@@ -197,7 +194,7 @@ mod test {
 			vec![3, 3, 5, 4, 9],
 			vec![3, 5, 3, 9, 0],
 		];
-		assert_eq!(get_score(&data, 1, 2), 4);
+		assert_eq!(get_score(&data, 2, 1), 4);
 	}
 }
 
