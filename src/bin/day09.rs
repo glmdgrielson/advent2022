@@ -35,6 +35,12 @@ impl Rope {
 		}
 		self.adjust_tail();
 	}
+
+	fn move_head_to(&mut self, pos: (i32, i32)) {
+		self.head = (self.head.0 + pos.0, self.tail.1 + pos.1);
+		self.adjust_tail();
+	}
+
 	/// Move the tail position so that it's near the head position.
 	fn adjust_tail(&mut self) {
 		loop {
@@ -169,10 +175,17 @@ fn part_one(tasks: Vec<Instruction>) -> usize {
 			if !tail_positions.contains(&rope.tail) {
 				// ...add this position to the list.
 				tail_positions.insert(rope.tail);
+				eprintln!("Adding position {:?}...", rope.tail);
 			}
 		}
 	}
 	tail_positions.len()
+}
+
+fn part_two(tasks: Vec<Instruction>) -> usize {
+	let rope = [Rope {head: (0,0), tail: (0, 0)}; 10];
+	// s
+	todo!();
 }
 
 #[cfg(test)]
