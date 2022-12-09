@@ -36,54 +36,9 @@ impl Rope {
 		self.adjust_tail();
 	}
 
-	fn move_head_to(&mut self, pos: (i32, i32)) {
-		self.head = (self.head.0 + pos.0, self.tail.1 + pos.1);
-		self.adjust_tail();
-	}
-
 	/// Move the tail position so that it's near the head position.
 	fn adjust_tail(&mut self) {
-		loop {
-			let x_diff = self.head.1 - self.tail.1;
-			let y_diff = self.head.0 - self.tail.0;
-			match (x_diff, y_diff) {
-				(0, 0) => break,
-				(0, y) => {
-					if y.abs() == 1 {
-						break;
-					} else if y > 0 {
-						self.tail.0 += 1;
-					} else {
-						self.tail.0 -= 1;
-					}
-				}
-				(x, 0) => {
-					if x.abs() == 1 {
-						break;
-					} else if x > 0 {
-						self.tail.1 += 1;
-					} else {
-						self.tail.1 -= 1;
-					}
-				}
-				(x, y) => {
-					if x.abs() == 1 && y.abs() == 1 {
-						break;
-					} else {
-						if x.is_positive() {
-							self.tail.1 += 1;
-						} else if x.is_negative() {
-							self.tail.1 -= 1;
-						}
-						if y.is_positive() {
-							self.tail.0 += 1;
-						} else if y.is_negative() {
-							self.tail.0 -= 1;
-						}
-					}
-				}
-			}
-		}
+		self.tail = adjust_tail(self.head, self.tail);
 	}
 }
 
@@ -120,10 +75,16 @@ fn main() {
 
 	let tasks: Vec<Instruction> = parse_input(data);
 
-	let positions = part_one(tasks);
+	let positions = part_one(tasks.clone());
 	println!(
 		"The number of positions the tail has reached is {}",
 		positions
+	);
+
+	let extra_positions = part_two(tasks);
+	println!(
+		"The number of positions the guy way in the back has reached is {}",
+		extra_positions
 	);
 	//
 }
@@ -183,112 +144,79 @@ fn part_one(tasks: Vec<Instruction>) -> usize {
 }
 
 fn part_two(tasks: Vec<Instruction>) -> usize {
-	let rope = [Rope {head: (0,0), tail: (0, 0)}; 10];
-	// s
-	todo!();
+	let mut rope = [(0, 0); 10];
+
+	let mut tail_positions = HashSet::new();
+	tail_positions.insert((0, 0));
+	for task in tasks {
+		for _ in 0..task.count {
+			match task.direction {
+				Direction::North => {
+					rope[0] = (rope[0].0 + 1, rope[0].1);
+				}
+				Direction::South => {
+					rope[0] = (rope[0].0 - 1, rope[0].1);
+				}
+				Direction::East => {
+					rope[0] = (rope[0].0, rope[0].1 - 1);
+				}
+				Direction::West => {
+					rope[0] = (rope[0].0, rope[0].1 + 1);
+				}
+			}
+			for idx in 1..rope.len() {
+				rope[idx] = adjust_tail(rope[idx - 1], rope[idx]);
+			}
+			if !tail_positions.contains(&rope[9]) {
+				tail_positions.insert(rope[9]);
+			}
+		}
+	}
+	tail_positions.len()
 }
 
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	const EXAMPLE: &str = "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2";
-	const TASKS: &[Instruction] = &[
-		Instruction {
-			direction: Direction::West,
-			count: 4,
-		},
-		Instruction {
-			direction: Direction::North,
-			count: 4,
-		},
-		Instruction {
-			direction: Direction::East,
-			count: 3,
-		},
-		Instruction {
-			direction: Direction::South,
-			count: 1,
-		},
-		Instruction {
-			direction: Direction::West,
-			count: 4,
-		},
-		Instruction {
-			direction: Direction::South,
-			count: 1,
-		},
-		Instruction {
-			direction: Direction::East,
-			count: 5,
-		},
-		Instruction {
-			direction: Direction::West,
-			count: 2,
-		},
-	];
-
-	#[test]
-	fn test_parse_input() {
-		assert_eq!(TASKS.to_owned(), parse_input(EXAMPLE.to_owned()));
-	}
-
-	#[test]
-	fn test_part_one() {
-		let tasks = TASKS.to_owned();
-		assert_eq!(part_one(tasks), 13);
-	}
-
-	#[test]
-	fn test_move_head() {
-		use std::collections::HashSet as Set;
-
-		// Brute force all of the known positions.
-		let mut expected = Set::new();
-		expected.insert((0, 0));
-		expected.insert((0, 1));
-		expected.insert((0, 2));
-		expected.insert((0, 3));
-		expected.insert((1, 4));
-		expected.insert((2, 1));
-		expected.insert((2, 2));
-		expected.insert((2, 3));
-		expected.insert((2, 4));
-		expected.insert((3, 3));
-		expected.insert((3, 4));
-		expected.insert((4, 2));
-		expected.insert((4, 3));
-
-		let mut rope = Rope {
-			head: (0, 0),
-			tail: (0, 0),
-		};
-		let mut actual = Set::new();
-		actual.insert((0, 0)); // Insert the default position.
-		for task in TASKS {
-			// For `count` number of times...
-			for _ in 0..task.count {
-				// Move the head of this rope.
-				rope.move_head(task.direction);
-				// If the tail has not already visited this position...
-				if !actual.contains(&rope.tail) {
-					// ...add this position to the list.
-					actual.insert(rope.tail);
+fn adjust_tail(head: (i32, i32), tail: (i32, i32)) -> (i32, i32) {
+	let mut tail = tail;
+	loop {
+		let x_diff = head.1 - tail.1;
+		let y_diff = head.0 - tail.0;
+		match (x_diff, y_diff) {
+			(0, 0) => break,
+			(0, y) => {
+				if y.abs() == 1 {
+					break;
+				} else if y > 0 {
+					tail.0 += 1;
+				} else {
+					tail.0 -= 1;
+				}
+			}
+			(x, 0) => {
+				if x.abs() == 1 {
+					break;
+				} else if x > 0 {
+					tail.1 += 1;
+				} else {
+					tail.1 -= 1;
+				}
+			}
+			(x, y) => {
+				if x.abs() == 1 && y.abs() == 1 {
+					break;
+				} else {
+					if x.is_positive() {
+						tail.1 += 1;
+					} else if x.is_negative() {
+						tail.1 -= 1;
+					}
+					if y.is_positive() {
+						tail.0 += 1;
+					} else if y.is_negative() {
+						tail.0 -= 1;
+					}
 				}
 			}
 		}
-
-		assert_eq!(expected, actual);
-		//
 	}
-
-	#[test]
-	fn test_diagonal_move_up() {
-		let mut rope = Rope {
-			head: (1, 4),
-			tail: (0, 3),
-		};
-		rope.move_head(Direction::North);
-		assert_eq!(rope.tail, (1, 4));
-	}
+	tail
 }
