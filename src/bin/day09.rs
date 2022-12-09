@@ -5,7 +5,6 @@
 /// Part 1
 /// ------
 /// How many different positions does the tail of this rope meet?
-use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::io::stdin;
 
@@ -38,35 +37,44 @@ impl Rope {
 	}
 	/// Move the tail position so that it's near the head position.
 	fn adjust_tail(&mut self) {
-		// Adjust y value.
-		match self.head.0.cmp(&self.tail.0) {
-			Ordering::Less => {
-				if self.head.0 != self.tail.0 - 1 {
-					self.tail.0 -= 1;
+		loop {
+			let x_diff = self.head.1 - self.tail.1;
+			let y_diff = self.head.0 - self.tail.0;
+			match (x_diff, y_diff) {
+				(0, 0) => break,
+				(0, y) => {
+					if y.abs() == 1 {
+						break;
+					} else if y > 0 {
+						self.tail.0 += 1;
+					} else {
+						self.tail.0 -= 1;
+					}
 				}
-			}
-			Ordering::Equal => {
-				// nothing needs to be done here.
-			}
-			Ordering::Greater => {
-				if self.head.0 != self.tail.0 + 1 {
-					self.tail.0 += 1;
+				(x, 0) => {
+					if x.abs() == 1 {
+						break;
+					} else if x > 0 {
+						self.tail.1 += 1;
+					} else {
+						self.tail.1 -= 1;
+					}
 				}
-			}
-		}
-		// Adjust x value.
-		match self.head.1.cmp(&self.tail.1) {
-			Ordering::Less => {
-				if self.head.1 != self.tail.1 - 1 {
-					self.tail.1 -= 1;
-				}
-			}
-			Ordering::Equal => {
-				// Already equal, we can leave this be.
-			}
-			Ordering::Greater => {
-				if self.head.1 != self.tail.1 + 1 {
-					self.tail.1 += 1;
+				(x, y) => {
+					if x.abs() == 1 && y.abs() == 1 {
+						break;
+					} else {
+						if x.is_positive() {
+							self.tail.1 += 1;
+						} else if x.is_negative() {
+							self.tail.1 -= 1;
+						}
+						if y.is_positive() {
+							self.tail.0 += 1;
+						} else if y.is_negative() {
+							self.tail.0 -= 1;
+						}
+					}
 				}
 			}
 		}
@@ -109,7 +117,7 @@ fn main() {
 	let positions = part_one(tasks);
 	println!(
 		"The number of positions the tail has reached is {}",
-		positions - 1
+		positions
 	);
 	//
 }
@@ -220,26 +228,10 @@ mod tests {
 
 	#[test]
 	fn test_move_head() {
-		use std::collections::BTreeSet;
-		let mut rope = Rope {
-			head: (0, 0),
-			tail: (0, 0),
-		};
-		let mut actual = BTreeSet::new();
-		for task in TASKS {
-			// For `count` number of times...
-			for _ in 0..task.count {
-				// Move the head of this rope.
-				rope.move_head(task.direction);
-				// If the tail has not already visited this position...
-				if !actual.contains(&rope.tail) {
-					// ...add this position to the list.
-					actual.insert(rope.tail);
-				}
-			}
-		}
+		use std::collections::HashSet as Set;
 
-		let mut expected = BTreeSet::new();
+		// Brute force all of the known positions.
+		let mut expected = Set::new();
 		expected.insert((0, 0));
 		expected.insert((0, 1));
 		expected.insert((0, 2));
@@ -254,7 +246,36 @@ mod tests {
 		expected.insert((4, 2));
 		expected.insert((4, 3));
 
+		let mut rope = Rope {
+			head: (0, 0),
+			tail: (0, 0),
+		};
+		let mut actual = Set::new();
+		actual.insert((0, 0)); // Insert the default position.
+		for task in TASKS {
+			// For `count` number of times...
+			for _ in 0..task.count {
+				// Move the head of this rope.
+				rope.move_head(task.direction);
+				// If the tail has not already visited this position...
+				if !actual.contains(&rope.tail) {
+					// ...add this position to the list.
+					actual.insert(rope.tail);
+				}
+			}
+		}
+
 		assert_eq!(expected, actual);
 		//
+	}
+
+	#[test]
+	fn test_diagonal_move_up() {
+		let mut rope = Rope {
+			head: (1, 4),
+			tail: (0, 3),
+		};
+		rope.move_head(Direction::North);
+		assert_eq!(rope.tail, (1, 4));
 	}
 }
