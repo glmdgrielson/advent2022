@@ -136,7 +136,6 @@ fn part_one(tasks: Vec<Instruction>) -> usize {
 			if !tail_positions.contains(&rope.tail) {
 				// ...add this position to the list.
 				tail_positions.insert(rope.tail);
-				eprintln!("Adding position {:?}...", rope.tail);
 			}
 		}
 	}
