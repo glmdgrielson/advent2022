@@ -136,11 +136,12 @@ impl Day10 {
 				grid.push('.');
 			}
 			// Check to see if we're about to overflow.
-			if cycle_count == 40 {
+			if cycle_count == 39 {
 				grid.push('\n');
 				cycle_count = 0;
+			} else {
+				cycle_count += 1;
 			}
-			cycle_count += 1;
 			match task {
 				Instruction::Add(n) => {
 					// Check to see if this pixel should be lit up.
@@ -150,11 +151,12 @@ impl Day10 {
 						grid.push('.');
 					}
 					// Check to see if we're about to overflow.
-					if cycle_count == 40 {
+					if cycle_count == 39 {
 						grid.push('\n');
 						cycle_count = 0;
+					} else {
+						cycle_count += 1;
 					}
-					cycle_count += 1;
 					register += n;
 				}
 				Instruction::Noop => {
