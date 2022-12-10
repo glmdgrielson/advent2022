@@ -94,10 +94,6 @@ impl Day10 {
 			cycle_count += 1;
 			if critical.contains(&cycle_count) {
 				critical_values.push(register);
-				eprintln!(
-					"Instruction: {}, cycle: {}, X: {}",
-					task, cycle_count, register
-				);
 			}
 			match task {
 				Instruction::Add(n) => {
@@ -107,10 +103,6 @@ impl Day10 {
 					// mid-instruction.
 					if critical.contains(&cycle_count) {
 						critical_values.push(register);
-						eprintln!(
-							"Instruction: {}, cycle: {}, X: {}",
-							task, cycle_count, register
-						);
 					}
 					register += n;
 				}
