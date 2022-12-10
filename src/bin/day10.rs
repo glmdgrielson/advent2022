@@ -31,7 +31,7 @@ impl fmt::Display for Instruction {
 impl Advent for Day10 {
 	type Answer1 = i32;
 
-	type Answer2 = ();
+	type Answer2 = String;
 
 	fn parse_input(input: &str) -> Self {
 		let mut code = Vec::new();
@@ -73,6 +73,10 @@ impl Advent for Day10 {
 			// Sum everything up.
 			.sum()
 	}
+
+	fn part_two(&self) -> String {
+		self.draw()
+	}
 }
 
 impl Day10 {
@@ -82,7 +86,6 @@ impl Day10 {
 		let mut cycle_count = 0;
 		let mut register = 1;
 		for task in &self.0 {
-
 			cycle_count += 1;
 			if critical.contains(&cycle_count) {
 				critical_values.push(register);
@@ -114,6 +117,49 @@ impl Day10 {
 
 		critical_values
 	}
+
+	fn draw(&self) -> String {
+		let mut grid = String::new();
+
+		let mut cycle_count = 0;
+		let mut register = 1;
+		for task in &self.0 {
+			// Check to see if this pixel should be lit up.
+			if (register - 1..=register + 1).contains(&cycle_count) {
+				grid.push('#');
+			} else {
+				grid.push('.');
+			}
+			// Check to see if we're about to overflow.
+			if cycle_count == 40 {
+				grid.push('\n');
+				cycle_count = 0;
+			}
+			cycle_count += 1;
+			match task {
+				Instruction::Add(n) => {
+					// Check to see if this pixel should be lit up.
+					if (register - 1..=register + 1).contains(&cycle_count) {
+						grid.push('#');
+					} else {
+						grid.push('.');
+					}
+					// Check to see if we're about to overflow.
+					if cycle_count == 40 {
+						grid.push('\n');
+						cycle_count = 0;
+					}
+					cycle_count += 1;
+					register += n;
+				}
+				Instruction::Noop => {
+					// This does NOTHING!
+				}
+			}
+		}
+
+		grid
+	}
 }
 
 fn main() {
@@ -121,6 +167,9 @@ fn main() {
 	let code = Day10::parse_input(&input);
 	let one = code.part_one();
 	println!("The sum of the important cycles is {}", one);
+
+	println!("The output of part 2 is:");
+	println!("{}", code.part_two());
 }
 
 #[cfg(test)]
@@ -190,5 +239,20 @@ mod tests {
 		let data = Day10::parse_input(&example);
 		assert_eq!(data.part_one(), 13140);
 		// assert_eq!()
+	}
+
+	#[test]
+	fn test_part_two() {
+		let example = get_example();
+
+		let expected = "##..##..##..##..##..##..##..##..##..##..\n\
+		###...###...###...###...###...###...###.\n\
+		####....####....####....####....####....\n\
+		#####.....#####.....#####.....#####.....\n\
+		######......######......######......####\n\
+		#######.......#######.......#######.....";
+		let actual = Day10::parse_input(&example).part_two();
+
+		assert_eq!(expected, actual);
 	}
 }
