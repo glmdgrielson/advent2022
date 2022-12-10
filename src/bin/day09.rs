@@ -94,23 +94,23 @@ fn parse_input(task: String) -> Vec<Instruction> {
 	for line in task.lines() {
 		let parts = line.split(' ').collect::<Vec<_>>();
 		let direction = parts[0];
-		let count = parts[1];
+		let count = parts[1].parse().expect("I can't count that high.");
 		let task = match direction {
 			"U" => Instruction {
 				direction: Direction::North,
-				count: count.parse().expect("I can't count that high."),
+				count,
 			},
 			"D" => Instruction {
 				direction: Direction::South,
-				count: count.parse().expect("I can't count that high."),
+				count,
 			},
 			"L" => Instruction {
 				direction: Direction::East,
-				count: count.parse().expect("I can't count that high."),
+				count,
 			},
 			"R" => Instruction {
 				direction: Direction::West,
-				count: count.parse().expect("I can't count that high."),
+				count,
 			},
 			dir => panic!("Where do you want me to go? '{}'?", dir),
 		};
