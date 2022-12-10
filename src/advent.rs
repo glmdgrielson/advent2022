@@ -1,5 +1,5 @@
 pub trait Advent {
-	/// The output desired for Part one of the puzzle.
+	/// The output desired for Part 1 of the puzzle.
 	type Answer1;
 	/// The output desired for Part 2 of the puzzle.
 	type Answer2;
