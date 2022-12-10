@@ -7,6 +7,11 @@
 /// Part 1
 /// ------
 /// Find the value of the register at varying cycles.
+/// 
+/// Part 2
+/// ------
+/// Use the instructions to render to the screen. Figure out what is being
+/// printed to the output.
 use advent::{input_to_str, Advent};
 use std::fmt;
 
