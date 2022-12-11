@@ -82,7 +82,6 @@ struct Throw {
 	dest: usize,
 }
 
-
 #[derive(Clone, Debug)]
 struct Day11(Vec<Monkey>);
 
@@ -213,11 +212,73 @@ impl Advent for Day11 {
 		// Return the product of the top two results.
 		checks[0] * checks[1]
 	}
+
+	fn part_two(&self) -> Self::Answer2 {
+		let mut monkeys = self.0.clone();
+		let factor: u32 = self.0.iter().map(|m| m.factor).product();
+		let factor = factor as u64;
+		// Hardcoding the number of monkeys. Hopefully this doesn't burn me.
+		let mut checks = [0; 8];
+
+		for _ in 0..10_000 {
+			for idx in 0..monkeys.len() {
+				checks[idx] += monkeys[idx].items.len();
+				let throws: Vec<_> = {
+					let throws = monkeys[idx]
+						.items
+						.iter()
+						.map(|&item| {
+							// Make this number less huge.
+							let item = item as u64;
+
+							let worry = match monkeys[idx].operation {
+								Operation::Add(val) => match val {
+									Some(val) => item + (val as u64),
+									None => item + item,
+								},
+								Operation::Multiply(val) => match val {
+									Some(val) => item * (val as u64),
+									None => item * item,
+								},
+							};
+
+							let worry: u32 = (worry % factor) as u32;
+
+							let target = match worry % monkeys[idx].factor {
+								0 => monkeys[idx].decision.0,
+								_ => monkeys[idx].decision.1,
+							};
+							Throw {
+								item: worry,
+								dest: target,
+							}
+						})
+						.collect();
+
+					monkeys[idx].items = Vec::new();
+
+					throws
+				};
+				for throw in throws {
+					monkeys[throw.dest].items.push(throw.item);
+				}
+			}
+		}
+
+		// Sort the list of checks.
+		checks.sort_by(|a, b| b.cmp(a));
+		// Return the product of the top two results.
+		checks[0] * checks[1]
+	}
 }
 
 fn main() {
 	let data = Day11::parse_input(&input_to_str());
 	println!("The peak amount of monkey business is {}", data.part_one());
+	println!(
+		"The total amount of monkey business with anxiety is {}",
+		data.part_two()
+	);
 }
 
 #[cfg(test)]
@@ -260,5 +321,18 @@ mod tests {
 
 		assert!(monkey.items.is_empty());
 		assert_eq!(expected, actual);
+	}
+
+	#[test]
+	fn test_part_two() {
+		use std::fs::File;
+		use std::io::Read;
+
+		let mut file = File::open("src/input/day11-example.txt")
+			.expect("File reading failed.");
+		let mut example = String::new();
+		file.read_to_string(&mut example).expect("Reading has failed.");
+
+		assert_eq!(Day11::parse_input(&example).part_two(), 2713310158);
 	}
 }
