@@ -11,8 +11,8 @@ use advent::{input_to_str, Advent};
 
 /// An operation that a monkey can apply.
 ///
-/// Both values take an option because there's a chance the second
-/// operand could be a pre-existing value.
+/// Both values take an [`Option`] because there's a chance the second
+/// operand could be the pre-existing value.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Operation {
 	Add(Option<u32>),
@@ -29,22 +29,73 @@ struct Monkey {
 	factor: u32,
 	/// The throw your monkey will make. The first value is on success,
 	/// and the second value is on failure.
-	decision: (u32, u32),
+	decision: (usize, usize),
 }
+
+impl Monkey {
+	/// Run the logic for all of the throws on this monkey's turn.
+	///
+	/// Note that as a side effect, this clears the monkey's list of items,
+	/// since, y'know, the monkey just threw them all away.
+	fn make_throws(&mut self) -> Vec<Throw> {
+		let throws = self
+			.items
+			.iter()
+			.map(|item| {
+				let worry = match self.operation {
+					Operation::Add(val) => match val {
+						Some(val) => item + val,
+						None => item + item,
+					},
+					Operation::Multiply(val) => match val {
+						Some(val) => item * val,
+						None => item * item,
+					},
+				};
+
+				// Divide worry level by three, rounding down.
+				let worry = worry / 3;
+
+				let target = match worry % self.factor {
+					0 => self.decision.0,
+					_ => self.decision.1,
+				};
+				Throw {
+					item: worry,
+					dest: target,
+				}
+			})
+			.collect();
+
+		self.items = Vec::new();
+
+		throws
+	}
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+/// A struct to add names to data.
+struct Throw {
+	/// The item being thrown.
+	item: u32,
+	/// The monkey being thrown to.
+	dest: usize,
+}
+
 
 #[derive(Clone, Debug)]
 struct Day11(Vec<Monkey>);
 
 // String constants used for parsing.
-const OPERATION_PREFIX: &str = "Operation: new = old";
-const FACTOR_PREFIX: &str = "Test: divisible by ";
-const TRUE_PREFIX: &str = "If true: throw to monkey ";
-const FALSE_PREFIX: &str = "If false: throw to monkey ";
+const OPERATION_PREFIX: &str = "  Operation: new = old";
+const FACTOR_PREFIX: &str = "  Test: divisible by ";
+const TRUE_PREFIX: &str = "    If true: throw to monkey ";
+const FALSE_PREFIX: &str = "    If false: throw to monkey ";
 
 impl Advent for Day11 {
-	type Answer1 = ();
+	type Answer1 = usize;
 
-	type Answer2 = ();
+	type Answer2 = usize;
 
 	fn parse_input(input: &str) -> Self {
 		let mut lines = input.lines();
@@ -67,7 +118,7 @@ impl Advent for Day11 {
 			let items = lines
 				.next()
 				.expect("Wait, that monkey isn't doing anything.");
-			let items = match items.strip_prefix("Starting items: ") {
+			let items = match items.strip_prefix("  Starting items: ") {
 				Some(list) => list
 					.split(", ")
 					.map(|c| c.parse().expect("Wait, that's a banana..."))
@@ -127,6 +178,9 @@ impl Advent for Day11 {
 				.parse()
 				.expect("Which monkey was that again?");
 
+			// Skip an empty line.
+			lines.next();
+
 			let monkey = Monkey {
 				items,
 				operation,
@@ -135,18 +189,35 @@ impl Advent for Day11 {
 			};
 			monkeys.push(monkey);
 		}
-		
+
 		Day11(monkeys)
 	}
 
-	fn part_one(&self) -> Self::Answer1 {
-		todo!()
+	fn part_one(&self) -> usize {
+		let mut monkeys = self.0.clone();
+		// Hardcoding the number of monkeys. Hopefully this doesn't burn me.
+		let mut checks = [0; 8];
+
+		for _ in 0..20 {
+			for idx in 0..monkeys.len() {
+				checks[idx] += monkeys[idx].items.len();
+				let throws = monkeys[idx].make_throws();
+				for throw in throws {
+					monkeys[throw.dest].items.push(throw.item);
+				}
+			}
+		}
+
+		// Sort the list of checks.
+		checks.sort_by(|a, b| b.cmp(a));
+		// Return the product of the top two results.
+		checks[0] * checks[1]
 	}
 }
 
 fn main() {
 	let data = Day11::parse_input(&input_to_str());
-	data.part_one();
+	println!("The peak amount of monkey business is {}", data.part_one());
 }
 
 #[cfg(test)]
@@ -171,6 +242,23 @@ mod tests {
 		let runner = Day11::parse_input(monkey);
 		let actual = runner.0;
 
+		assert_eq!(expected, actual);
+	}
+
+	#[test]
+	fn test_make_throws() {
+		let mut monkey = Monkey {
+			items: vec![79, 98],
+			operation: Operation::Multiply(Some(19)),
+			factor: 23,
+			decision: (2, 3),
+		};
+
+		let expected =
+			vec![Throw { item: 500, dest: 3 }, Throw { item: 620, dest: 3 }];
+		let actual = monkey.make_throws();
+
+		assert!(monkey.items.is_empty());
 		assert_eq!(expected, actual);
 	}
 }
