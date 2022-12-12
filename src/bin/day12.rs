@@ -5,198 +5,203 @@
 /// Part 1
 /// ------
 /// Find the shortest path from `S` to `E`.
-use advent::{input_to_str, Advent, Point};
+///
+/// Part 2
+/// ------
+/// Find the shortest path from the end to any point of lowest elevation.
 use std::cmp::{Ordering, Reverse};
 use std::collections::{BinaryHeap, HashSet};
 
-const NULL_POINT: Point<usize> = Point {
-	x: usize::MAX,
-	y: usize::MAX,
-};
+use advent::{input_to_str, Advent};
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 struct Day12 {
 	maze: Vec<Vec<usize>>,
-	start: Point<usize>,
-	end: Point<usize>,
+	start: Coordinate,
+	end: Coordinate,
 }
 
 impl Advent for Day12 {
 	type Answer1 = u32;
 
-	type Answer2 = ();
+	type Answer2 = u32;
 
 	fn parse_input(input: &str) -> Self {
-		// Filling this in with bogus fields so that I have a marker
-		// for bad input.
-		let mut start: Point<usize> = Point {
-			x: usize::MAX,
-			y: usize::MAX,
-		};
-		let mut end = Point {
-			x: usize::MAX,
-			y: usize::MAX,
-		};
-
-		let maze = input
+		let mut start_coord: Option<Coordinate> = None;
+		let mut end_coord: Option<Coordinate> = None;
+		let height_map: Vec<Vec<usize>> = input
 			.lines()
 			.enumerate()
-			.map(|(c_idx, line)| {
+			.map(|(line_index, line)| {
 				line.chars()
 					.enumerate()
-					.map(|(r_idx, r)| match r {
+					.map(|(c_index, c)| match c {
 						'S' => {
-							start = Point { x: r_idx, y: c_idx };
+							start_coord = Some(Coordinate {
+								x: c_index,
+								y: line_index,
+							});
 							0
 						}
 						'E' => {
-							end = Point { x: r_idx, y: c_idx };
+							end_coord = Some(Coordinate {
+								x: c_index,
+								y: line_index,
+							});
 							25
 						}
-						_ => (r as usize) - 97,
+						_ => (c as usize) - 97,
 					})
 					.collect()
 			})
 			.collect();
+		let start = start_coord.expect("Starting point not found.");
+		let end = end_coord.expect("Ending coordinate not found.");
 
-		// Check that we've assigned to `start` and `end`.
-		assert_ne!(start, NULL_POINT, "Starting position not found.");
-		assert_ne!(end, NULL_POINT, "Ending position not found.");
-		Day12 { maze, start, end }
+		Day12 {
+			maze: height_map,
+			start,
+			end,
+		}
 	}
 
-	fn part_one(&self) -> u32 {
-		let west_border = self.maze[0].len();
-		let south_border = self.maze.len();
-
+	fn part_one(&self) -> Self::Answer1 {
 		let start_path = PathProgress {
-			point: self.start,
-			steps: 0,
+			coord: self.start,
+			steps_taken: 0,
 		};
 		let mut paths = BinaryHeap::new();
 		paths.push(Reverse(start_path));
-		let mut visited_points = HashSet::new();
+		let mut visited_coords: HashSet<Coordinate> = HashSet::new();
 
 		let mut steps_taken = 0;
 		while let Some(Reverse(path)) = paths.pop() {
-			if path.point == self.end {
-				steps_taken = path.steps;
-				for Reverse(path) in paths {
-					eprintln!("Potential path: {:?}", path);
-				}
+			if path.coord == self.end {
+				steps_taken = path.steps_taken;
 				break;
 			}
-			if visited_points.contains(&path.point) {
+			if visited_coords.contains(&path.coord) {
 				continue;
 			}
 
-			let steps_taken = path.steps + 1;
-			visited_points.insert(path.point);
-			let row = path.point.x;
-			let col = path.point.y;
-			let current_height = self.maze[col][row];
+			let steps_taken = path.steps_taken + 1;
+			visited_coords.insert(path.coord);
+			let current_height = self.maze[path.coord.y][path.coord.x];
 
-			// Check east of us.
-			if path.point.x >= 1 {
-				let point: Point<usize> = path.point - (1, 0);
-				if self.maze[point.y][point.x] <= current_height + 1
-					&& !visited_points.contains(&point)
+			if let Some(left_coord) = path.coord.left() {
+				if self.maze[left_coord.y][left_coord.x] <= current_height + 1
+					&& !visited_coords.contains(&left_coord)
 				{
 					paths.push(Reverse(PathProgress {
-						point,
-						steps: steps_taken,
+						coord: left_coord,
+						steps_taken,
 					}));
 				}
 			}
 
-			// Check north of us.
-			if path.point.y >= 1 {
-				let point = path.point - (0, 1);
-				if self.maze[point.y][point.x] <= current_height + 1
-					&& !visited_points.contains(&point)
+			if let Some(up_coord) = path.coord.up() {
+				if self.maze[up_coord.y][up_coord.x] <= current_height + 1
+					&& !visited_coords.contains(&up_coord)
 				{
 					paths.push(Reverse(PathProgress {
-						point,
-						steps: steps_taken,
+						coord: up_coord,
+						steps_taken,
 					}));
 				}
 			}
 
-			// Check west of us.
-			let point = path.point + (1, 0);
-			if point.x < west_border
-				&& self.maze[point.y][point.x] <= current_height + 1
-				&& !visited_points.contains(&point)
+			let right_coord = path.coord.right();
+			if right_coord.x < self.maze[right_coord.y].len()
+				&& self.maze[right_coord.y][right_coord.x] <= current_height + 1
+				&& !visited_coords.contains(&right_coord)
 			{
 				paths.push(Reverse(PathProgress {
-					point,
-					steps: steps_taken,
+					coord: right_coord,
+					steps_taken,
 				}));
 			}
 
-			// Check south of us.
-			let point = path.point + (0, 1);
-			if point.y < south_border
-				&& self.maze[point.y][point.x] <= current_height + 1
-				&& !visited_points.contains(&point)
+			let down_coord = path.coord.down();
+			if down_coord.y < self.maze.len()
+				&& self.maze[down_coord.y][down_coord.x] <= current_height + 1
+				&& !visited_coords.contains(&down_coord)
 			{
 				paths.push(Reverse(PathProgress {
-					point,
-					steps: steps_taken,
+					coord: down_coord,
+					steps_taken,
 				}));
 			}
 		}
+
 		steps_taken
 	}
 }
 
-#[derive(Clone, PartialEq, Eq,  Debug)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+struct Coordinate {
+	x: usize,
+	y: usize,
+}
+
+impl Coordinate {
+	fn left(&self) -> Option<Self> {
+		if self.x > 0 {
+			Some(Self {
+				x: self.x - 1,
+				y: self.y,
+			})
+		} else {
+			None
+		}
+	}
+
+	fn up(&self) -> Option<Self> {
+		if self.y > 0 {
+			Some(Self {
+				x: self.x,
+				y: self.y - 1,
+			})
+		} else {
+			None
+		}
+	}
+
+	fn right(&self) -> Self {
+		Self {
+			x: self.x + 1,
+			y: self.y,
+		}
+	}
+
+	fn down(&self) -> Self {
+		Self {
+			x: self.x,
+			y: self.y + 1,
+		}
+	}
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct PathProgress {
-	/// The current point of this path.
-	point: Point<usize>,
-	/// The number of steps taken so far.
-	steps: u32,
+	coord: Coordinate,
+	steps_taken: u32,
 }
 
 impl Ord for PathProgress {
 	fn cmp(&self, other: &Self) -> Ordering {
-		self.steps
-			.cmp(&other.steps)
-			.then_with(|| self.point.cmp(&other.point))
+		self.steps_taken
+			.cmp(&other.steps_taken)
+			.then_with(|| self.coord.cmp(&other.coord))
 	}
 }
 
 impl PartialOrd for PathProgress {
 	fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-		match self.point.partial_cmp(&other.point) {
-			Some(core::cmp::Ordering::Equal) => {}
-			ord => return ord,
-		}
-		self.steps.partial_cmp(&other.steps)
+		Some(self.cmp(other))
 	}
 }
 
 fn main() {
-	let maze = Day12::parse_input(&input_to_str());
-	println!("The shortest path in the maze is {}", maze.part_one());
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	#[test]
-	fn test_part_one() {
-		use std::fs::File;
-		use std::io::Read;
-
-		let file = File::open("src/input/day12-example.txt");
-		let mut file = file.expect("Example input file is needed.");
-
-		let mut example = String::new();
-		file.read_to_string(&mut example)
-			.expect("Input reading has failed.");
-		
-		assert_eq!(Day12::parse_input(&example).part_one(), 31);
-	}
+	let runner = Day12::parse_input(&input_to_str());
+	println!("Path to the top takes {} steps", runner.part_one());
 }
