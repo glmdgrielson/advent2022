@@ -5,13 +5,13 @@ use std::ops::{Add, AddAssign};
 mod advent;
 pub use advent::Advent;
 
-#[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Default, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A point struct since I keep switching up x and y coordinates.
 pub struct Point {
 	/// The horizontal value.
-	x: i32,
+	pub x: i32,
 	/// The vertical value.
-	y: i32,
+	pub y: i32,
 }
 
 impl Add for Point {
@@ -46,10 +46,10 @@ impl Add<(i32, i32)> for Point {
 }
 
 impl AddAssign<(i32, i32)> for Point {
-    fn add_assign(&mut self, rhs: (i32, i32)) {
-        self.x += rhs.0;
+	fn add_assign(&mut self, rhs: (i32, i32)) {
+		self.x += rhs.0;
 		self.y += rhs.1;
-    }
+	}
 }
 
 /// This is formatted as if this was a tuple.
