@@ -81,6 +81,10 @@ impl Advent for Day12 {
 		while let Some(Reverse(path)) = paths.pop() {
 			if path.point == self.end {
 				steps_taken = path.steps;
+				for Reverse(path) in paths {
+					eprintln!("Potential path: {:?}", path);
+				}
+				// eprintln!()
 				break;
 			}
 			if visited_points.contains(&path.point) {
@@ -147,7 +151,7 @@ impl Advent for Day12 {
 	}
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq,  Debug)]
 struct PathProgress {
 	/// The current point of this path.
 	point: Point<usize>,
