@@ -287,12 +287,7 @@ mod tests {
 
 	#[test]
 	fn test_parse_input() {
-		let monkey = "Monkey 0:\n\
-		Starting items: 79, 98\n\
-		Operation: new = old * 19\n\
-		Test: divisible by 23\n\
-		  If true: throw to monkey 2\n\
-		  If false: throw to monkey 3\n";
+		let monkey = "Monkey 0:\n  Starting items: 79, 98\n  Operation: new = old * 19\n  Test: divisible by 23\n    If true: throw to monkey 2\n    If false: throw to monkey 3\n";
 
 		let expected = vec![Monkey {
 			items: vec![79, 98],
@@ -331,7 +326,8 @@ mod tests {
 		let mut file = File::open("src/input/day11-example.txt")
 			.expect("File reading failed.");
 		let mut example = String::new();
-		file.read_to_string(&mut example).expect("Reading has failed.");
+		file.read_to_string(&mut example)
+			.expect("Reading has failed.");
 
 		assert_eq!(Day11::parse_input(&example).part_two(), 2713310158);
 	}
