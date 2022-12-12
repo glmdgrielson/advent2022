@@ -65,7 +65,7 @@ impl Advent for Day12 {
 		}
 	}
 
-	fn part_one(&self) -> Self::Answer1 {
+	fn part_one(&self) -> u32 {
 		let start_path = PathProgress {
 			coord: self.start,
 			steps_taken: 0,
@@ -124,6 +124,81 @@ impl Advent for Day12 {
 			let down_coord = path.coord.down();
 			if down_coord.y < self.maze.len()
 				&& self.maze[down_coord.y][down_coord.x] <= current_height + 1
+				&& !visited_coords.contains(&down_coord)
+			{
+				paths.push(Reverse(PathProgress {
+					coord: down_coord,
+					steps_taken,
+				}));
+			}
+		}
+
+		steps_taken
+	}
+
+	/// This computes part one mostly in reverse.
+	/// 
+	/// This means that we are checking for a height one _less_
+	/// than our current one as well as bailing when we have hit height zero.
+	fn part_two(&self) -> Self::Answer2 {
+		let start_path = PathProgress {
+			coord: self.end,
+			steps_taken: 0,
+		};
+		let mut paths = BinaryHeap::new();
+		paths.push(Reverse(start_path));
+		let mut visited_coords: HashSet<Coordinate> = HashSet::new();
+
+		let mut steps_taken = 0;
+		while let Some(Reverse(path)) = paths.pop() {
+			if self.maze[path.coord.y][path.coord.x] == 0 {
+				steps_taken = path.steps_taken;
+				break;
+			}
+			if visited_coords.contains(&path.coord) {
+				continue;
+			}
+
+			let steps_taken = path.steps_taken + 1;
+			visited_coords.insert(path.coord);
+			let current_height = self.maze[path.coord.y][path.coord.x];
+
+			if let Some(left_coord) = path.coord.left() {
+				if self.maze[left_coord.y][left_coord.x] >= current_height - 1
+					&& !visited_coords.contains(&left_coord)
+				{
+					paths.push(Reverse(PathProgress {
+						coord: left_coord,
+						steps_taken,
+					}));
+				}
+			}
+
+			if let Some(up_coord) = path.coord.up() {
+				if self.maze[up_coord.y][up_coord.x] >= current_height - 1
+					&& !visited_coords.contains(&up_coord)
+				{
+					paths.push(Reverse(PathProgress {
+						coord: up_coord,
+						steps_taken,
+					}));
+				}
+			}
+
+			let right_coord = path.coord.right();
+			if right_coord.x < self.maze[right_coord.y].len()
+				&& self.maze[right_coord.y][right_coord.x] >= current_height - 1
+				&& !visited_coords.contains(&right_coord)
+			{
+				paths.push(Reverse(PathProgress {
+					coord: right_coord,
+					steps_taken,
+				}));
+			}
+
+			let down_coord = path.coord.down();
+			if down_coord.y < self.maze.len()
+				&& self.maze[down_coord.y][down_coord.x] >= current_height - 1
 				&& !visited_coords.contains(&down_coord)
 			{
 				paths.push(Reverse(PathProgress {
@@ -204,4 +279,5 @@ impl PartialOrd for PathProgress {
 fn main() {
 	let runner = Day12::parse_input(&input_to_str());
 	println!("Path to the top takes {} steps", runner.part_one());
+	println!("Optimal trail takes {} steps", runner.part_two());
 }
