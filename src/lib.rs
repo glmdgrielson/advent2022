@@ -1,20 +1,23 @@
 use std::fmt;
 use std::io::stdin;
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, Sub};
 
 mod advent;
 pub use advent::Advent;
 
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A point struct since I keep switching up x and y coordinates.
-pub struct Point {
+pub struct Point<T = i32> {
 	/// The horizontal value.
-	pub x: i32,
+	pub x: T,
 	/// The vertical value.
-	pub y: i32,
+	pub y: T,
 }
 
-impl Add for Point {
+impl<T> Add for Point<T>
+where
+	T: Add<Output = T>,
+{
 	type Output = Self;
 
 	#[inline]
@@ -26,7 +29,10 @@ impl Add for Point {
 	}
 }
 
-impl AddAssign for Point {
+impl<T> AddAssign for Point<T>
+where
+	T: AddAssign,
+{
 	#[inline]
 	fn add_assign(&mut self, rhs: Self) {
 		self.x += rhs.x;
@@ -34,10 +40,13 @@ impl AddAssign for Point {
 	}
 }
 
-impl Add<(i32, i32)> for Point {
-	type Output = Point;
+impl<T> Add<(T, T)> for Point<T>
+where
+	T: Add<Output = T>,
+{
+	type Output = Point<T>;
 
-	fn add(self, rhs: (i32, i32)) -> Self::Output {
+	fn add(self, rhs: (T, T)) -> Self::Output {
 		Point {
 			x: self.x + rhs.0,
 			y: self.y + rhs.1,
@@ -45,10 +54,41 @@ impl Add<(i32, i32)> for Point {
 	}
 }
 
-impl AddAssign<(i32, i32)> for Point {
-	fn add_assign(&mut self, rhs: (i32, i32)) {
+impl<T> AddAssign<(T, T)> for Point<T>
+where
+	T: AddAssign,
+{
+	fn add_assign(&mut self, rhs: (T, T)) {
 		self.x += rhs.0;
 		self.y += rhs.1;
+	}
+}
+
+impl<T> Sub for Point<T>
+where
+	T: Sub<Output = T>,
+{
+	type Output = Point<T>;
+
+	fn sub(self, rhs: Self) -> Self::Output {
+		Point {
+			x: self.x - rhs.x,
+			y: self.y - rhs.y,
+		}
+	}
+}
+
+impl<T> Sub<(T, T)> for Point<T>
+where
+	T: Sub<Output = T>,
+{
+	type Output = Point<T>;
+
+	fn sub(self, rhs: (T, T)) -> Self::Output {
+		Point {
+			x: self.x - rhs.0,
+			y: self.y - rhs.1,
+		}
 	}
 }
 
