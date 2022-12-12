@@ -84,7 +84,6 @@ impl Advent for Day12 {
 				for Reverse(path) in paths {
 					eprintln!("Potential path: {:?}", path);
 				}
-				// eprintln!()
 				break;
 			}
 			if visited_points.contains(&path.point) {
