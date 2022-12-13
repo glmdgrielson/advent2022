@@ -1,17 +1,18 @@
-/// Day 10's Advent of Code puzzle
-/// ==============================
-/// Puzzle input consists of a list of instructions, either `noop` which bumps
-/// the cycle counter, or `addx n` which adds `n` to some register after two
-/// cycles.
-///
-/// Part 1
-/// ------
-/// Find the value of the register at varying cycles.
-///
-/// Part 2
-/// ------
-/// Use the instructions to render to the screen. Figure out what is being
-/// printed to the output.
+//! Day 10's Advent of Code puzzle
+//! ==============================
+//! Puzzle input consists of a list of instructions, either `noop` which bumps
+//! the cycle counter, or `addx n` which adds `n` to some register after two
+//! cycles.
+//!
+//! Part 1
+//! ------
+//! Find the value of the register at varying cycles.
+//!
+//! Part 2
+//! ------
+//! Use the instructions to render to the screen. Figure out what is being
+//! printed to the output.
+
 use std::fmt;
 
 use advent::{input_to_str, Advent};

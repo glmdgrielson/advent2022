@@ -1,14 +1,15 @@
-/// Day 12's Advent of Code puzzle
-/// ==============================
-/// Puzzle input consists of _MAZE_.
-///
-/// Part 1
-/// ------
-/// Find the shortest path from `S` to `E`.
-///
-/// Part 2
-/// ------
-/// Find the shortest path from the end to any point of lowest elevation.
+//! Day 12's Advent of Code puzzle
+//! ==============================
+//! Puzzle input consists of _MAZE_.
+//!
+//! Part 1
+//! ------
+//! Find the shortest path from `S` to `E`.
+//!
+//! Part 2
+//! ------
+//! Find the shortest path from the end to any point of lowest elevation.
+
 use std::cmp::{Ordering, Reverse};
 use std::collections::{BinaryHeap, HashSet};
 
@@ -137,7 +138,7 @@ impl Advent for Day12 {
 	}
 
 	/// This computes part one mostly in reverse.
-	/// 
+	///
 	/// This means that we are checking for a height one _less_
 	/// than our current one as well as bailing when we have hit height zero.
 	fn part_two(&self) -> Self::Answer2 {

@@ -1,14 +1,15 @@
-/// Day 6's Advent of Code puzzle
-/// =============================
-/// For the first time, puzzle input is a single stream of characters. Oh no.
-///
-/// Part 1
-/// ------
-/// Find the index of the first four characters that are unique.
-///
-/// Part 2
-/// ------
-/// Find the index of the first sequence of _fourteen_ unique characters.
+//! Day 6's Advent of Code puzzle
+//! =============================
+//! For the first time, puzzle input is a single stream of characters. Oh no.
+//!
+//! Part 1
+//! ------
+//! Find the index of the first four characters that are unique.
+//!
+//! Part 2
+//! ------
+//! Find the index of the first sequence of _fourteen_ unique characters.
+
 use std::io::{stdin, Read};
 
 // Constants for the size of the area needed for each step.

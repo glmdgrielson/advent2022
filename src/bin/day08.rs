@@ -1,11 +1,16 @@
-/// Day 8's Advent of Code puzzle
-/// =============================
-/// Puzzle input consists of a rectangle of numbers.
-///
-/// Part 1
-/// ------
-/// How many trees are visible from the outside? (I'm reminded of one of the
-/// Simon Tatham puzzles.)
+//! Day 8's Advent of Code puzzle
+//! =============================
+//! Puzzle input consists of a rectangle of numbers.
+//!
+//! Part 1
+//! ------
+//! How many trees are visible from the outside? (I'm reminded of one of the
+//! Simon Tatham puzzles.)
+//! 
+//! Part 2
+//! ------
+//! Find the tree that can see the most other trees.
+
 use std::collections::HashSet;
 use std::io::stdin;
 use std::iter::ExactSizeIterator;

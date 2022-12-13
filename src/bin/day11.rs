@@ -1,12 +1,13 @@
-/// Day 11's Advent of Code puzzle
-/// ==============================
-/// Oh no, monkey business. Puzzle input consists of the behavior
-/// of various monkeys. For once, all of it fits on a single screen
-/// in my browser.
-///
-/// Part 1
-/// ------
-/// After 20 rounds of Monkey Business, what level of chaos have we reached?
+//! Day 11's Advent of Code puzzle
+//! ==============================
+//! Oh no, monkey business. Puzzle input consists of the behavior
+//! of various monkeys. For once, all of it fits on a single screen
+//! in my browser.
+//!
+//! Part 1
+//! ------
+//! After 20 rounds of Monkey Business, what level of chaos have we reached?
+
 use advent::{input_to_str, Advent};
 
 /// An operation that a monkey can apply.

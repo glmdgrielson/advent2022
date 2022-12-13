@@ -1,10 +1,15 @@
-/// Day 9's Advent of Code puzzle
-/// =============================
-/// Puzzle input consists of a list of directions.
-///
-/// Part 1
-/// ------
-/// How many different positions does the tail of this rope meet?
+//! Day 9's Advent of Code puzzle
+//! =============================
+//! Puzzle input consists of a list of directions.
+//!
+//! Part 1
+//! ------
+//! How many different positions does the tail of this rope meet?
+//! 
+//! Part 2
+//! ------
+//! If the rope had ten knots, how many positions does the very last knot meet?
+
 use std::collections::HashSet;
 use std::io::stdin;
 

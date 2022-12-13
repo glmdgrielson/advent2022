@@ -1,18 +1,19 @@
-/// Day 7's Advent of Code puzzle
-/// =============================
-/// Puzzle input consists of a terminal session. Two commands are being used:
-/// `cd`, which changes the current directory, and `ls` which lists all of the
-/// files in the specified directory.
-///
-/// Part 1
-/// ------
-/// Find the sum of all of the "small" directories, where small is defined
-/// as taking no more than `100_000` bytes.
-///
-/// Part 2
-/// ------
-/// Now it's time to clean up space. Find the smallest directory that will
-/// give us enough space, so we don't `rm -rf /` like a dolt.
+//! Day 7's Advent of Code puzzle
+//! =============================
+//! Puzzle input consists of a terminal session. Two commands are being used:
+//! `cd`, which changes the current directory, and `ls` which lists all of the
+//! files in the specified directory.
+//!
+//! Part 1
+//! ------
+//! Find the sum of all of the "small" directories, where small is defined
+//! as taking no more than `100_000` bytes.
+//!
+//! Part 2
+//! ------
+//! Now it's time to clean up space. Find the smallest directory that will
+//! give us enough space, so we don't `rm -rf /` like a dolt.
+
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::stdin;
