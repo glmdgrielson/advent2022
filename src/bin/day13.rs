@@ -255,6 +255,7 @@ fn parse_packet(data: &str) -> PacketData {
 fn main() {
 	let runner = Day13::parse_input(&input_to_str());
 	println!("The sum of mismatched pairs is {}", runner.part_one());
+	println!("The decoder key for this signal is {}", runner.part_two());
 }
 
 fn _copied_parse(
