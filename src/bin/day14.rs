@@ -6,9 +6,16 @@
 //! ------
 //! How many sand units can fall before sand reaches below the floor
 //! of the cave?
+//!
+//! Part 2
+//! ------
+//! Assuming an infinite floor two spots below the lowest point of the input,
+//! when does the sand clog itself?
 
 use advent::{input_to_str, Advent, Point};
 use std::collections::HashSet;
+
+const STARTING_POSITION: Point<u32> = Point { x: 500, y: 0 };
 
 #[derive(Clone, Debug)]
 struct Day14 {
@@ -25,7 +32,7 @@ struct Day14 {
 impl Advent for Day14 {
 	type Answer1 = u32;
 
-	type Answer2 = ();
+	type Answer2 = u32;
 
 	fn parse_input(input: &str) -> Self {
 		let mut maze = HashSet::new();
@@ -85,7 +92,7 @@ impl Advent for Day14 {
 	fn part_one(&self) -> Self::Answer1 {
 		let floor = self.floor;
 		let mut maze = self.maze.clone();
-		let mut sand = Point { x: 500, y: 0 };
+		let mut sand = STARTING_POSITION;
 		let mut sand_counter = 0;
 		'fall: loop {
 			// Check to see if we've gone past the floor.
@@ -120,7 +127,57 @@ impl Advent for Day14 {
 
 			maze.insert(sand);
 			sand_counter += 1;
-			sand = Point { x: 500, y: 0 };
+			sand = STARTING_POSITION;
+		}
+		sand_counter
+	}
+
+	fn part_two(&self) -> Self::Answer2 {
+		let floor = self.floor + 2;
+		let mut maze = self.maze.clone();
+		let mut sand = STARTING_POSITION;
+		let mut sand_counter = 0;
+		'fall: loop {
+			// Optimization so we don't constantly create points.
+			let next_points = [
+				Point {
+					x: sand.x,
+					y: sand.y + 1,
+				},
+				Point {
+					x: sand.x - 1,
+					y: sand.y + 1,
+				},
+				Point {
+					x: sand.x + 1,
+					y: sand.y + 1,
+				},
+			];
+
+			for point in next_points {
+				// Check for the floor.
+				if point.y == floor {
+					break;
+				}
+				// Check if this point is empty.
+				if !maze.contains(&point) {
+					// If so, start the fall again from there.
+					sand = point;
+					continue 'fall;
+				}
+			}
+
+			// We can't fall any more, so add this point to the maze.
+			maze.insert(sand);
+			// Increment the counter for the answer.
+			sand_counter += 1;
+			// Check to see if we've clogged the cave.
+			if maze.contains(&STARTING_POSITION) {
+				break;
+			} else {
+				// Otherwise, start again.
+				sand = STARTING_POSITION;
+			}
 		}
 		sand_counter
 	}
@@ -142,6 +199,10 @@ fn main() {
 	println!(
 		"The total number of sand units before stabilizing is {}",
 		runner.part_one()
+	);
+	println!(
+		"The number of sand units it takes to clog the cave is {}",
+		runner.part_two()
 	);
 }
 
@@ -178,5 +239,14 @@ mod tests {
 			.expect("Reading has failed.");
 
 		assert_eq!(Day14::parse_input(&example).part_one(), 24);
+	}
+
+	#[test]
+	fn test_part_two() {
+		use advent::get_example_input;
+		let example = get_example_input("src/input/day14-example.txt");
+		let runner = Day14::parse_input(&example);
+
+		assert_eq!(runner.part_two(), 93);
 	}
 }
