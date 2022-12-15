@@ -1,9 +1,11 @@
 use std::fmt;
+use std::fs::File;
 use std::io::stdin;
+use std::io::Read;
 use std::ops::{Add, AddAssign, Sub};
 
 mod advent;
-pub use advent::Advent;
+pub use crate::advent::Advent;
 
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A point struct since I keep switching up x and y coordinates.
@@ -112,4 +114,22 @@ pub fn input_to_str() -> String {
 		})
 		.collect::<Vec<_>>()
 		.join("\n")
+}
+
+/// A convenience file for running tests.
+/// 
+/// Takes the file name of an example input and returns the text contents
+/// of said file. This is useful for example input.
+/// ```
+/// use advent::get_example_input;
+///
+/// let example = get_example_input("src/input/day14-example.txt");
+/// ```
+pub fn get_example_input(filename: &str) -> String {
+	let mut file = File::open(filename).expect("File reading failed.");
+	let mut example = String::new();
+	file.read_to_string(&mut example)
+		.expect("Reading has failed.");
+
+	example
 }
