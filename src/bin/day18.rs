@@ -128,3 +128,26 @@ fn main() {
 	let runner = Day18::parse_input(&input_to_str());
 	println!("There are {} unmet faces.", runner.part_one());
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_parse_input() {
+		let example = "1,1,1";
+		assert_eq!(
+			Day18::parse_input(example).0,
+			vec![Cube { x: 1, y: 1, z: 1 }]
+		);
+	}
+
+	#[test]
+	fn test_part_one() {
+		use advent::get_example_input;
+
+		let example = get_example_input("src/input/day18-example.txt");
+		let runner = Day18::parse_input(&example);
+		assert_eq!(runner.part_one(), 64);
+	}
+}
