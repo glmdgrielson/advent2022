@@ -80,34 +80,34 @@ impl Advent for Day18 {
 		for cube in self.0.iter() {
 			let cubes = [
 				Cube {
-					x: cube.x.saturating_sub(1),
+					x: cube.x.overflowing_sub(1).0,
 					y: cube.y,
 					z: cube.z,
 				},
 				Cube {
-					x: cube.x.saturating_add(1),
+					x: cube.x.overflowing_add(1).0,
 					y: cube.y,
 					z: cube.z,
 				},
 				Cube {
 					x: cube.x,
-					y: cube.y.saturating_sub(1),
+					y: cube.y.overflowing_sub(1).0,
 					z: cube.z,
 				},
 				Cube {
 					x: cube.x,
-					y: cube.y.saturating_add(1),
+					y: cube.y.overflowing_add(1).0,
 					z: cube.z,
 				},
 				Cube {
 					x: cube.x,
 					y: cube.y,
-					z: cube.z.saturating_sub(1),
+					z: cube.z.overflowing_sub(1).0,
 				},
 				Cube {
 					x: cube.x,
 					y: cube.y,
-					z: cube.z.saturating_add(1),
+					z: cube.z.overflowing_add(1).0,
 				},
 			];
 			for other_cube in cubes {
