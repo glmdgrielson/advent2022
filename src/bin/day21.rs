@@ -13,6 +13,7 @@
 
 use advent::{input_to_str, Advent};
 use std::collections::HashMap;
+use std::fmt::Display;
 
 /// The squad of monkeys, matched with their names.
 #[derive(Debug)]
@@ -95,10 +96,12 @@ impl Advent for Day21 {
 						unreachable!("And the human fits in where?")
 					}
 					(Ok(target), Err(part)) => {
+						eprintln!("{} = {}", target, part);
 						// Found a human on the right.
 						part.equal_target(target)
 					}
 					(Err(part), Ok(target)) => {
+						eprintln!("{} = {}", target, part);
 						// Found a human on the left.
 						part.equal_target(target)
 					}
@@ -187,7 +190,7 @@ impl Monkey {
 								map.get(right).expect("Missing partner!");
 							// Right side has to evaluate to something.
 							let value = monkey.evaluate(map);
-							Err(Partial::Mul(
+							Err(Partial::Div(
 								Box::new(Partial::Value(None)),
 								Box::new(Partial::Value(Some(value))),
 							))
@@ -230,7 +233,7 @@ impl Monkey {
 								map.get(left).expect("Missing partner!");
 							// Left side has to evaluate to something.
 							let value = monkey.evaluate(map);
-							Err(Partial::Mul(
+							Err(Partial::Div(
 								Box::new(Partial::Value(Some(value))),
 								Box::new(Partial::Value(None)),
 							))
@@ -241,7 +244,9 @@ impl Monkey {
 					let one = map.get(left).expect("Missing monkey Partner!");
 					let two = map.get(right).expect("Missing monkey partner!");
 					let one = one.try_evaluate(map);
+					eprintln!("Left side: {} -> {:?}", left, one);
 					let two = two.try_evaluate(map);
+					eprintln!("Right side: {} -> {:?}", right, two);
 					match (one, two) {
 						// Both values are numbers; behave as in `evaluate`
 						(Ok(one), Ok(two)) => match op {
@@ -461,10 +466,15 @@ impl Partial {
 				match (one, two) {
 					(Ok(one), Ok(two)) => one * two,
 					(Ok(yea), Err(nay)) => {
-						let target = target - yea;
-						nay.equal_target(-target)
+						let target = target + yea;
+						// let target = -target;
+						nay.equal_target(target)
 					}
-					(Err(nay), Ok(yea)) => nay.equal_target(target + yea),
+					(Err(nay), Ok(yea)) => {
+						let target = target - yea;
+						let target = -target;
+						nay.equal_target(target)
+					},
 					(Err(_), Err(_)) => {
 						unreachable!("Only one monkey should be blank!")
 					}
@@ -506,8 +516,51 @@ impl Partial {
 	}
 }
 
+impl Display for Partial {
+	/// This implementation writes out a partial as if it were
+	/// a mathematical equation.
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		match self {
+			Partial::Add(one, two) => {
+				f.write_fmt(format_args!("{} + {}", *one, *two))
+			}
+			Partial::Sub(one, two) => {
+				f.write_fmt(format_args!("{} - {}", *one, *two))
+			}
+			Partial::Mul(one, two) => {
+				f.write_fmt(format_args!("{} * {}", *one, *two))
+			}
+			Partial::Div(one, two) => {
+				f.write_fmt(format_args!("{} / {}", *one, *two))
+			}
+			Partial::Value(num) => {
+				if let Some(num) = num {
+					f.write_fmt(format_args!("{}", num))
+				} else {
+					f.write_str("humn")
+				}
+			}
+		}
+	}
+}
+
 fn main() {
 	let runner = Day21::parse_input(&input_to_str());
 	println!("Root monkey says {}", runner.part_one());
 	println!("Human monkey needs to say {}", runner.part_two());
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_try_evaluate() {
+		use advent::get_example_input;
+		let example = Day21::parse_input(&get_example_input(
+			"src/input/day21-example.txt",
+		));
+
+		assert_eq!(example.part_two(), 301);
+	}
 }
