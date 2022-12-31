@@ -40,7 +40,6 @@ impl Advent for Day21 {
 			.map(|&k| (k.to_owned(), Monkey::Integer(0)))
 			.collect::<HashMap<_, _>>();
 		for (index, line) in input.lines().enumerate() {
-			eprintln!("Monkey #{}: {}", index, line);
 			let (name, op) = line.split_at(4);
 			let name = name.to_string();
 			let op = op.strip_prefix(": ").expect("Missing separator");
