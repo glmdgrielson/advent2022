@@ -75,7 +75,7 @@ impl Ord for Progress {
 impl Advent for Day16 {
 	type Answer1 = u32;
 
-	type Answer2 = ();
+	type Answer2 = u32;
 
 	fn parse_input(input: &str) -> Self {
 		let mut valves = HashMap::new();
@@ -179,6 +179,11 @@ impl Advent for Day16 {
 		}
 		max_pressure
 	}
+
+	fn part_two(&self) -> Self::Answer2 {
+		// 
+		todo!()
+	}
 }
 
 fn main() {
@@ -198,5 +203,17 @@ mod tests {
 		let runner = Day16::parse_input(&example);
 
 		assert_eq!(runner.part_one(), 1651);
+	}
+
+	#[test]
+	/// Since part one takes an ungodly amount of time, I'm putting this in
+	/// as a test.
+	fn run_part_two() {
+		use advent::get_example_input;
+
+		let data = get_example_input("src/input/day16.txt");
+		let runner = Day16::parse_input(&data);
+
+		assert_eq!(runner.part_two(), 2469);
 	}
 }
