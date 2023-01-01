@@ -36,6 +36,7 @@ impl Advent for Day17 {
 	}
 
 	fn part_one(&self) -> Self::Answer1 {
+		let mut floor = vec![0u32; 5];
 		todo!()
 	}
 }
