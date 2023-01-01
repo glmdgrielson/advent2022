@@ -136,8 +136,8 @@ impl Advent for Day16 {
 				// We've hit our maximum, stop doing work.
 				if progress.released_pressure > max_pressure {
 					max_pressure = progress.released_pressure;
-					continue;
 				}
+				continue;
 			}
 
 			// Adjust time.
@@ -197,6 +197,6 @@ mod tests {
 		let example = get_example_input("src/input/day16-example.txt");
 		let runner = Day16::parse_input(&example);
 
-		assert_eq!(runner.part_one(), 81);
+		assert_eq!(runner.part_one(), 1651);
 	}
 }
