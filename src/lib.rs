@@ -101,7 +101,7 @@ impl fmt::Display for Point {
 	}
 }
 
-pub fn point(x: i32, y: i32) -> Point {
+pub fn point<T>(x: T, y: T) -> Point<T> {
 	Point { x, y }
 }
 
